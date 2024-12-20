@@ -15,3 +15,5 @@ Classes principais:
  Pagamento
  Sistema
  Utilitários (por exemplo, validações ou base de dados)
+
+Obs: Sujeito a alterações durante o desenvolvimento
