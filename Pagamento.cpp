@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
-#include <cmath>
-#include <string>
+#include <limits>
 
 // Classe base abstrata Pagamento
 class Pagamento {
@@ -16,7 +15,11 @@ public:
     void realizarPagamento(double valor, bool &pagamentoRealizado) override {
         double valorPago;
         std::cout << "O valor total e R$ " << valor << ".\nInsira o valor dado pelo cliente: ";
-        std::cin >> valorPago;
+        while (!(std::cin >> valorPago) || valorPago <= 0) {
+            std::cout << "Entrada invalida. Por favor, insira um valor numerico positivo: ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 
         if (valorPago > valor) {
             std::cout << "Pagamento realizado com sucesso. Troco: R$ " << valorPago - valor << ".\n";
@@ -62,39 +65,16 @@ public:
 class PagamentoEscambo : public Pagamento {
 public:
     void realizarPagamento(double valor, bool &pagamentoRealizado) override {
-        int escolhaItem;
-        std::cout << "Escolha o item de troca para realizar o escambo:\n";
-        std::cout << "1. Livro do Pablo Marcal (adicional de 6 meses de carne de R$ 120)\n";
-        std::cout << "2. Tres espetinhos de carne de gato\n";
-        std::cout << "3. Pista Hot Wheels (30 dias sem multa, multa apos esse periodo)\n";
-        std::cout << "4. Carrinho de compras\n";
-        std::cout << "5. 1g de antimateria\n";
-        std::cin >> escolhaItem;
+        char avaliacao;
+        std::cout << "O objeto para troca foi avaliado pelo balconista. Objeto aceito? (S/N): ";
+        std::cin >> avaliacao;
+        avaliacao = toupper(avaliacao);
 
-        switch (escolhaItem) 
-        {
-        case 1:
-            std::cout << "Escambo aceito: Livro do Pablo Marcal. Alem do livro voce devera pagar um carne de R$ 120 por 6 meses.\n";
+        if (avaliacao == 'S') {
+            std::cout << "Pagamento realizado por escambo.\n";
             pagamentoRealizado = true;
-            break;
-        case 2:
-            std::cout << "Escambo aceito: Tres espetinhos de carne de gato. Pagamento realizado com sucesso.\n";
-            pagamentoRealizado = true;
-            break;
-        case 3:
-            std::cout << "Escambo aceito: Pista Hot Wheels. Voce tem 30 dias para devolver o filme sem multa.\n";
-            pagamentoRealizado = true;
-            break;
-        case 4:
-            std::cout << "Escambo aceito: Carrinho de compras. Pagamento realizado com sucesso.\n";
-            pagamentoRealizado = true;
-            break;
-        case 5:
-            std::cout << "Escambo aceito: 1g de antimateria. Pagamento realizado com sucesso. Cuidado com reacoes perigosas.\n";
-            pagamentoRealizado = true;
-            break;
-        default:
-            std::cout << "Opcao invalida. Tente novamente.\n";
+        } else {
+            std::cout << "Objeto rejeitado. Pagamento nao realizado.\n";
             pagamentoRealizado = false;
         }
     }
@@ -144,21 +124,16 @@ int main() {
         std::cout << "Escolha o tipo de filme que deseja alugar:\n";
         std::cout << "1. Filme recem-lancado (R$ 15.00 por 2 dias)\n";
         std::cout << "2. Filme fora de cartaz (R$ 10.00 por 2 dias)\n";
-        std::cin >> escolhaFilme;
-
-        if (escolhaFilme == 1) {
-            valorEmprestimo = precoLancamento;
-        } else if (escolhaFilme == 2) {
-            valorEmprestimo = precoForaCartaz;
-        } else {
-            std::cout << "Opcao invalida. Tente novamente.\n";
-            continue;
+        while (!(std::cin >> escolhaFilme) || (escolhaFilme != 1 && escolhaFilme != 2)) {
+            std::cout << "Opcao invalida. Por favor, escolha 1 ou 2: ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
+        valorEmprestimo = (escolhaFilme == 1) ? precoLancamento : precoForaCartaz;
         std::cout << "O valor do emprestimo e R$ " << valorEmprestimo << ".\n";
 
         Locadora locadora(std::make_unique<PagamentoDinheiro>());
-
         int metodoPagamento;
         bool pagamentoRealizado = false;
         int diasPermitidos = 2; // Por padrão, 2 dias permitidos
@@ -170,45 +145,43 @@ int main() {
             std::cout << "3. Cartao de debito\n";
             std::cout << "4. Pix\n";
             std::cout << "5. Escambo\n";
-            std::cin >> metodoPagamento;
 
-            if (metodoPagamento == 5) {
-                locadora.alterarMetodoPagamento(std::make_unique<PagamentoEscambo>());
-                locadora.processarPagamento(valorEmprestimo, pagamentoRealizado);
-                if (pagamentoRealizado) {
-                    std::cout << "Pagamento concluido por escambo.\n";
-                    if (diasPermitidos == 30) {
-                        diasPermitidos = 30; // Configurar 30 dias apenas para escambo com pista de Hot Wheels
-                    }
-                }
-            } else {
-                switch (metodoPagamento) {
-                case 1:
-                    locadora.alterarMetodoPagamento(std::make_unique<PagamentoDinheiro>());
-                    break;
-                case 2:
-                    locadora.alterarMetodoPagamento(std::make_unique<PagamentoCartaoCredito>());
-                    break;
-                case 3:
-                    locadora.alterarMetodoPagamento(std::make_unique<PagamentoCartaoDebito>());
-                    break;
-                case 4:
-                    locadora.alterarMetodoPagamento(std::make_unique<PagamentoPix>());
-                    break;
-                default:
-                    std::cout << "Opcao invalida. Tente novamente.\n";
-                    continue;
-                }
-
-                locadora.processarPagamento(valorEmprestimo, pagamentoRealizado);
+            while (!(std::cin >> metodoPagamento) || metodoPagamento < 1 || metodoPagamento > 5) {
+                std::cout << "Opcao invalida. Por favor, escolha entre 1 e 5: ";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
+
+            switch (metodoPagamento) {
+            case 1:
+                locadora.alterarMetodoPagamento(std::make_unique<PagamentoDinheiro>());
+                break;
+            case 2:
+                locadora.alterarMetodoPagamento(std::make_unique<PagamentoCartaoCredito>());
+                break;
+            case 3:
+                locadora.alterarMetodoPagamento(std::make_unique<PagamentoCartaoDebito>());
+                break;
+            case 4:
+                locadora.alterarMetodoPagamento(std::make_unique<PagamentoPix>());
+                break;
+            case 5:
+                locadora.alterarMetodoPagamento(std::make_unique<PagamentoEscambo>());
+                break;
+            }
+
+            locadora.processarPagamento(valorEmprestimo, pagamentoRealizado);
         }
 
-        // Simulação de devolução
+        // Simulacao de devolucao
         int diasAtraso;
         std::cout << "\nDevolucao do filme:\n";
         std::cout << "Quantos dias apos o emprestimo o filme foi devolvido? ";
-        std::cin >> diasAtraso;
+        while (!(std::cin >> diasAtraso) || diasAtraso < 0) {
+            std::cout << "Entrada invalida. Por favor, insira um numero inteiro positivo: ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 
         double multa = Multa::calcularMulta(valorEmprestimo, diasAtraso, diasPermitidos);
         if (multa > 0) {
@@ -221,7 +194,12 @@ int main() {
                 std::cout << "2. Cartao de credito\n";
                 std::cout << "3. Cartao de debito\n";
                 std::cout << "4. Pix\n";
-                std::cin >> metodoPagamento;
+
+                while (!(std::cin >> metodoPagamento) || metodoPagamento < 1 || metodoPagamento > 4) {
+                    std::cout << "Opcao invalida. Por favor, escolha entre 1 e 4: ";
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
 
                 switch (metodoPagamento) {
                 case 1:
@@ -236,9 +214,6 @@ int main() {
                 case 4:
                     locadora.alterarMetodoPagamento(std::make_unique<PagamentoPix>());
                     break;
-                default:
-                    std::cout << "Opcao invalida. Tente novamente.\n";
-                    continue;
                 }
 
                 locadora.processarPagamento(multa, pagamentoRealizado);
@@ -249,7 +224,12 @@ int main() {
 
         int continuar;
         std::cout << "Deseja realizar outro emprestimo? (1. Sim, 2. Nao): ";
-        std::cin >> continuar;
+        while (!(std::cin >> continuar) || (continuar != 1 && continuar != 2)) {
+            std::cout << "Entrada invalida. Por favor, escolha 1 ou 2: ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
         if (continuar != 1) {
             break;
         }
