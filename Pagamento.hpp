@@ -1,10 +1,9 @@
-#ifndef LOCADORA_HPP
-#define LOCADORA_HPP
+#ifndef LOCADORA_H
+#define LOCADORA_H
 
 #include <iostream>
 #include <memory>
 #include <limits>
-#include <cctype>
 
 // Classe base abstrata Pagamento
 class Pagamento {
@@ -56,10 +55,8 @@ private:
 
 public:
     Locadora(std::unique_ptr<Pagamento> metodo);
-
     void processarPagamento(double valor, bool &pagamentoRealizado);
     void alterarMetodoPagamento(std::unique_ptr<Pagamento> novoMetodo);
 };
 
-#endif // LOCADORA_HPP
-
+#endif // LOCADORA_H
