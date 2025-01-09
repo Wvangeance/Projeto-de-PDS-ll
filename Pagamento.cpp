@@ -65,6 +65,7 @@ public:
 class PagamentoEscambo : public Pagamento {
 public:
     void realizarPagamento(double valor, bool &pagamentoRealizado) override {
+        std::cout << "O valor estimado do escambo e R$ " << valor << ".\n";
         char avaliacao;
         std::cout << "O objeto para troca foi avaliado pelo balconista. Objeto aceito? (S/N): ";
         std::cin >> avaliacao;
