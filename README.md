@@ -1,10 +1,6 @@
 ## Sistema de Gerenciamento de Locadora de Filmes  
 
 ## Descrição do Problema  
-Com o crescimento das demandas por entretenimento, muitas locadoras de filmes enfrentam dificuldades para gerenciar suas operações de maneira eficiente. Processos manuais, como controle de estoque de filmes, registro de clientes e acompanhamento de locações, frequentemente resultam em erros, atrasos e perda de oportunidades de negócio.  
-
-Além disso, a falta de um sistema centralizado torna o acompanhamento de pagamentos, multas por atrasos e geração de relatórios extremamente trabalhosos. Isso impacta diretamente na experiência dos clientes, que buscam conveniência e agilidade no serviço, e na administração da locadora, que necessita de dados precisos para tomar decisões estratégicas.  
-
 O objetivo deste projeto é criar um sistema informatizado que automatize e otimize o gerenciamento de filmes, clientes, locações e pagamentos. Esse sistema será capaz de reduzir erros, aumentar a eficiência operacional e proporcionar uma experiência mais agradável tanto para os clientes quanto para os administradores da locadora.  
 
 ## Planejamento do Sistema  
