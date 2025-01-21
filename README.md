@@ -32,7 +32,7 @@ Desenvolver um sistema completo para gerenciar todas as operações de uma locad
 O projeto foi planejado para ser modular e escalável, permitindo futuras expansões e adaptações conforme as necessidades da locadora evoluam.  
 
 ## Estrutura de diretórios
-- **include/**        (Para conter arquivos de cabeçalho - .hpp)
+- **include/**        (Para conter arquivos de cabeçalho .hpp)
 - **src/**            (Para conter arquivos fonte .cpp)
 
 
