@@ -11,5 +11,6 @@ void salvarDadosEmArquivo (const std::string& nomeArquivo, const std::vector<std
 std::vector<std::string> lerDadosArquivo (const std::string& nomeArquivo);
 int calcularDiasDeDiferenca (const std::tm& data1, const std::tm& data2);
 double calcularMultaPorAtraso (int diasAtraso, double valorPorDia);
+bool validarCPF(const std::string& cpf); //Função para validar CPF
 
 #endif // ULTILITARIOS_HPP
