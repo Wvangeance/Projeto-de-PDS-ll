@@ -1,6 +1,4 @@
-#include <iostream>
-#include <memory>
-#include <limits>
+#include "Pagamento.hpp"
 
 // Classe base abstrata Pagamento
 class Pagamento {
