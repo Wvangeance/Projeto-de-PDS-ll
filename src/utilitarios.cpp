@@ -6,7 +6,7 @@
 
 bool validarTelefone (const std::string& telefone) {
   std::regex telefoneRegex ("\\d{3}-\\d{3}-\\d{4}");
-returno std::regex_match (telefone, telefoneRegex);
+return std::regex_match (telefone, telefoneRegex);
 }
 
 //Função para validar formato de email
