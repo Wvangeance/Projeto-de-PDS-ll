@@ -2,6 +2,9 @@
 #include <regex>
 #include <fstream>
 
+#include <string>
+#include <iostream>
+
 //Função para validar formato de telefone
 bool validarTelefone (const std::string& telefone) {
   std::regex telefoneRegex ("\\d{3}-\\d{3}-\\d{4}");
@@ -51,3 +54,35 @@ return std::difftime (t2,t1)/(60*60*24);
 double calcularMultaPorAtraso (int diasAtraso, double valorPorDia) {
   return diasAtraso * valorPorDia;
 }
+
+//Validação de CPF
+bool validarCPF (conststd::string& cpf){
+  //Verifica o tamanho do CPF
+  std::regex regexCpf("\\d{11}");
+  if(!std::regex_match(cpf,regexCpf)){
+    return false;
+  }
+
+//Calculo do primeiro digito verificador
+int soma1 = 0;
+int peso[] = {10,9,8,7,6,5,4,3,2}
+for (int i = 0; i < 9; ++i){
+  soma1 += (cpf[i] - '0' * peso1[i];
+}
+
+int digito1 = 11 - (soma1 % 11);
+if (digito1 >= 10) digito1 = 0;
+
+//Calculo do segundo digito verificador
+int soma2 = 0;
+int peso2[] = {11,10,9,8,7,6,5,4,3,2};
+for (int i = 0; i < 10; ++i){
+  soma2 += (cpf[i] - '0') * peso2[i];
+}
+int digito2 = 11 - (soma2 % 11);
+if (digito2 >= 10) digito2 = 0;
+
+//Verifica se os digitos calculados estão corretos
+return (cpf[9] - '0' == digito1 && cpf[10] - '0' == digita2);
+}
+//Fim do verificação de CPF
