@@ -1,45 +1,31 @@
-#include <iostream>
+#include <iostream> 
 #include <iomanip>
 #include <fstream>
-#include <algorithm> 
-#include "Locações.hpp"
+#include <algorithm>
+#include "Locacao.hpp"
 
-// Classe para Cliente
-class Cliente {
-public:
-    int id;
-    std::string nome;
-    std::string telefone;
+// Implementação do construtor da classe Cliente
+Cliente::Cliente(int id, const std::string& nome, const std::string& telefone)
+    : id(id), nome(nome), telefone(telefone) {}
 
-    Cliente(int id, const std::string& nome, const std::string& telefone)
-        : id(id), nome(nome), telefone(telefone) {}
-};
+// Implementação do construtor da classe Locacao
+Locacao::Locacao(int id, Cliente cliente, const std::string& dataLocacao, const std::string& dataDevolucao)
+    : id(id), cliente(cliente), dataLocacao(dataLocacao), dataDevolucao(dataDevolucao), devolvido(false) {}
 
-// Classe para Locacao
-class Locacao {
-public:
-    int id;
-    Cliente cliente;
-    std::string dataLocacao;
-    std::string dataDevolucao;
-    bool devolvido;
+// Método para marcar a locação como devolvida
+void Locacao::marcarComoDevolvido() {
+    devolvido = true;
+}
 
-    Locacao(int id, Cliente cliente, const std::string& dataLocacao, const std::string& dataDevolucao)
-        : id(id), cliente(cliente), dataLocacao(dataLocacao), dataDevolucao(dataDevolucao), devolvido(false) {}
-
-    void marcarComoDevolvido() {
-        devolvido = true;
-    }
-
-    void exibirDetalhes() const {
-        std::cout << "Locacao ID: " << id << "\n";
-        std::cout << "Cliente: " << cliente.nome << " (Telefone: " << cliente.telefone << ")\n";
-        std::cout << "Data de Locacao: " << dataLocacao << "\n";
-        std::cout << "Data de Devolucao: " << dataDevolucao << "\n";
-        std::cout << "Status: " << (devolvido ? "Devolvido" : "Nao devolvido") << "\n";
-        std::cout << "-----------------------------\n";
-    }
-};
+// Método para exibir os detalhes da locação
+void Locacao::exibirDetalhes() const {
+    std::cout << "Locacao ID: " << id << "\n";
+    std::cout << "Cliente: " << cliente.nome << " (Telefone: " << cliente.telefone << ")\n";
+    std::cout << "Data de Locacao: " << dataLocacao << "\n";
+    std::cout << "Data de Devolucao: " << dataDevolucao << "\n";
+    std::cout << "Status: " << (devolvido ? "Devolvido" : "Nao devolvido") << "\n";
+    std::cout << "-----------------------------\n";
+}
 
 // Função para carregar dados de usuários de um arquivo
 std::vector<Cliente> carregarUsuarios(const std::string& nomeArquivo) {
