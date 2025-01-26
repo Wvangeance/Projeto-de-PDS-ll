@@ -1,9 +1,8 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <iomanip>
 #include <fstream>
-#include <algorithm> // Para std::find_if
+#include <algorithm> 
+#include "Locações.hpp"
 
 // Classe para Cliente
 class Cliente {

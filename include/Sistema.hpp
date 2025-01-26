@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 #include "Filmes.hpp"
-#include "Cadastro_Cliente.hpp"
-#include "Locacao.hpp"
+#include "Cliente.hpp"
+#include "Locações.hpp"
 #include "Pagamento.hpp"
 
 class Sistema {
