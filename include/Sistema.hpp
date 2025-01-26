@@ -1,8 +1,6 @@
 #ifndef SISTEMA_HPP
 #define SISTEMA_HPP
 
-#include <vector>
-#include <string>
 #include "Filmes.hpp"
 #include "Cliente.hpp"
 #include "Locações.hpp"
