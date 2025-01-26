@@ -7,7 +7,7 @@ TEST(PessoaTest, DefaultConstructor) {
 
     // Teste indireto de listarArquivo para garantir que o arquivo vazio
     testing::internal::CaptureStdout();
-    pessoa.listarArquivo(); // Deve imprimir "Erro ao abrir o arquivo..."
+    pessoa.listarArquivo(); 
     std::string output = testing::internal::GetCapturedStdout();
 
     ASSERT_NE(output.find("Erro ao abrir o arquivo"), std::string::npos);
