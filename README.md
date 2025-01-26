@@ -28,9 +28,9 @@ Responsável pelo registro das transações de locação, incluindo datas de ret
 Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.  
 - **Sistema**  
 Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.
-- **Promoção**
+- **Promoção**  
 Gerencia promoções e benefícios oferecidos pelo sistema.
-- **Histórico**
+- **Histórico**  
 Gerencia e organiza o histórico de atividades do sistema.
   
 
