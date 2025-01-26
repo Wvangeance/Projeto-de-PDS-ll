@@ -12,8 +12,10 @@ Desenvolver um sistema completo para gerenciar todas as operações de uma locad
 - Cadastro e gerenciamento de filmes.  
 - Cadastro e gerenciamento de clientes.  
 - Registro e gerenciamento de locações.  
-- Controle de pagamentos, incluindo multas por atraso.  
-- Geração de relatórios para análise de dados (opcional).  
+- Controle de pagamentos, incluindo multas por atraso.
+- Utilitários (contém ferramentas auxiliares, como validações de dados, e suporte para cálculos específicos).
+- Gestão de promoções e programas de fidelidade.
+- Histórico detalhado de atividades para relatórios e análises.
 
 ### Classes Principais  
 - **Filme**  
@@ -25,14 +27,16 @@ Desenvolver um sistema completo para gerenciar todas as operações de uma locad
 - **Pagamento**  
   Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.  
 - **Sistema**  
-  Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.  
-- **Utilitários**  
-  Contém ferramentas auxiliares, como validações de dados, operações em banco de dados, e suporte para cálculos específicos.  
+  Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.
+- **Promoção**
+  Gerencia promoções e benefícios oferecidos pelo sistema.
+- **Histórico**
+  Gerencia e organiza o histórico de atividades do sistema.
+  
 
 O projeto foi planejado para ser modular e escalável, permitindo futuras expansões e adaptações conforme as necessidades da locadora evoluam.  
 
 ## Estrutura de diretórios
 - **include/**        (Para conter arquivos de cabeçalho .hpp)
 - **src/**            (Para conter arquivos fonte .cpp)
-
-
+- **tests/**          (Para conter arquivos de testes)
