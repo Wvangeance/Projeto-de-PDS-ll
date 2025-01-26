@@ -19,19 +19,19 @@ Desenvolver um sistema completo para gerenciar todas as operações de uma locad
 
 ### Classes Principais  
 - **Filme**  
-  Representa os filmes disponíveis na locadora, armazenando informações como título, gênero, ano de lançamento, e disponibilidade.  
+Representa os filmes disponíveis na locadora, armazenando informações como título, gênero, ano de lançamento, e disponibilidade.  
 - **Cliente**  
-  Gerencia os dados dos clientes, como nome, endereço, telefone, e histórico de locações.  
+Gerencia os dados dos clientes, como nome, endereço, telefone, e histórico de locações.  
 - **Locação**  
-  Responsável pelo registro das transações de locação, incluindo datas de retirada e devolução, e status de pagamento.  
+Responsável pelo registro das transações de locação, incluindo datas de retirada e devolução, e status de pagamento.  
 - **Pagamento**  
-  Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.  
+Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.  
 - **Sistema**  
-  Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.
+Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.
 - **Promoção**
-  Gerencia promoções e benefícios oferecidos pelo sistema.
+Gerencia promoções e benefícios oferecidos pelo sistema.
 - **Histórico**
-  Gerencia e organiza o histórico de atividades do sistema.
+Gerencia e organiza o histórico de atividades do sistema.
   
 
 O projeto foi planejado para ser modular e escalável, permitindo futuras expansões e adaptações conforme as necessidades da locadora evoluam.  
