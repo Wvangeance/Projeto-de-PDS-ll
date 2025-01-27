@@ -1,89 +1,68 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "Locacao.hpp"
+#include <utility>
+#include "Locações.hpp"
+#include "Cliente.hpp"
+#include "Filmes.hpp"
 
-// Mock para simular o carregamento de dados
-class MockDataLoader {
+// Mock para Cliente
+class MockCliente : public Pessoa {
 public:
-    MOCK_METHOD(std::vector<Cliente>, carregarUsuarios, (const std::string&), ());
-    MOCK_METHOD(std::vector<std::string>, carregarFilmes, (const std::string&), ());
+    MOCK_METHOD(std::string, getNome, (), (const));
+    MOCK_METHOD(std::string, getCPF, (), (const));
 };
 
-// Teste para validar o construtor da classe Cliente
-TEST(ClienteTest, Construtor) {
-    Cliente cliente(1, "Naruto Uzumaki", "123456789");
-    EXPECT_EQ(cliente.id, 1);
-    EXPECT_EQ(cliente.nome, "Naruto Uzumaki");
-    EXPECT_EQ(cliente.telefone, "123456789");
+// Mock para Filme
+class MockFilme : public Filme {
+public:
+    MOCK_METHOD(std::string, getTitulo, (), (const));
+    MOCK_METHOD(std::string, getGenero, (), (const));
+    MOCK_METHOD(int, getDuracao, (), (const));
+};
+
+// Testes para a classe Locacao
+TEST(LocacaoTest, ConstrutorPadrao) {
+    Locacao locacao;
+    EXPECT_EQ(locacao.getDataLocacao(), "");
+    EXPECT_EQ(locacao.getDataDevolucao(), "");
 }
 
-// Teste para validar o construtor da classe Locacao
-TEST(LocacaoTest, Construtor) {
-    Cliente cliente(1, "Naruto Uzumaki", "123456789");
-    Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
+TEST(LocacaoTest, ConstrutorParametrizado) {
+    MockCliente cliente;
+    MockFilme filme;
 
-    EXPECT_EQ(locacao.id, 1);
-    EXPECT_EQ(locacao.cliente.nome, "Naruto Uzumaki");
-    EXPECT_EQ(locacao.dataLocacao, "01/01/2023");
-    EXPECT_EQ(locacao.dataDevolucao, "10/01/2023");
-    EXPECT_FALSE(locacao.devolvido);
+    EXPECT_CALL(cliente, getNome()).WillRepeatedly(::testing::Return("Joao"));
+    EXPECT_CALL(cliente, getCPF()).WillRepeatedly(::testing::Return("12345678900"));
+
+    EXPECT_CALL(filme, getTitulo()).WillRepeatedly(::testing::Return("Matrix"));
+    EXPECT_CALL(filme, getGenero()).WillRepeatedly(::testing::Return("Ficcao"));
+    EXPECT_CALL(filme, getDuracao()).WillRepeatedly(::testing::Return(120));
+
+    Locacao locacao(cliente, filme, "2025-01-01", "2025-01-10");
+
+    EXPECT_EQ(locacao.getDataLocacao(), "2025-01-01");
+    EXPECT_EQ(locacao.getDataDevolucao(), "2025-01-10");
 }
 
-// Teste para validar o método marcarComoDevolvido
-TEST(LocacaoTest, MarcarComoDevolvido) {
-    Cliente cliente(1, "Naruto Uzumaki", "123456789");
-    Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
+TEST(LocacaoTest, SettersAndGetters) {
+    MockCliente cliente;
+    MockFilme filme;
 
-    locacao.marcarComoDevolvido();
-    EXPECT_TRUE(locacao.devolvido);
+    EXPECT_CALL(cliente, getNome()).WillRepeatedly(::testing::Return("Ana"));
+    EXPECT_CALL(cliente, getCPF()).WillRepeatedly(::testing::Return("09876543211"));
+
+    EXPECT_CALL(filme, getTitulo()).WillRepeatedly(::testing::Return("Inception"));
+    EXPECT_CALL(filme, getGenero()).WillRepeatedly(::testing::Return("Aventura"));
+    EXPECT_CALL(filme, getDuracao()).WillRepeatedly(::testing::Return(150));
+
+    Locacao locacao;
+    locacao.setCliente(cliente);
+    locacao.setFilme(filme);
+    locacao.setDataLocacao("2025-02-01");
+    locacao.setDataDevolucao("2025-02-15");
+
+    EXPECT_EQ(locacao.getDataLocacao(), "2025-02-01");
+    EXPECT_EQ(locacao.getDataDevolucao(), "2025-02-15");
 }
 
-// Teste para carregar usuários com sucesso
-TEST(UtilityTest, CarregarUsuarios) {
-    std::ofstream arquivo("usuarios_mock.txt");
-    arquivo << "1;Naruto Uzumaki;123456789\n";
-    arquivo << "2;Sakura Haruno;987654321\n";
-    arquivo.close();
-
-    std::vector<Cliente> clientes = carregarUsuarios("usuarios_mock.txt");
-    EXPECT_EQ(clientes.size(), 2);
-    EXPECT_EQ(clientes[0].nome, "Naruto Uzumaki");
-    EXPECT_EQ(clientes[1].telefone, "987654321");
-
-    std::remove("usuarios_mock.txt"); // Remover arquivo mock após teste
-}
-
-// Teste para carregar filmes com sucesso
-TEST(UtilityTest, CarregarFilmes) {
-    std::ofstream arquivo("filmes_mock.txt");
-    arquivo << "Filme A\n";
-    arquivo << "Filme B\n";
-    arquivo.close();
-
-    std::vector<std::string> filmes = carregarFilmes("filmes_mock.txt");
-    EXPECT_EQ(filmes.size(), 2);
-    EXPECT_EQ(filmes[0], "Filme A");
-    EXPECT_EQ(filmes[1], "Filme B");
-
-    std::remove("filmes_mock.txt"); // Remover arquivo mock após teste
-}
-
-// Teste para verificar exibição de detalhes de locação
-TEST(LocacaoTest, ExibirDetalhes) {
-    Cliente cliente(1, "Naruto Uzumaki", "123456789");
-    Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
-
-    testing::internal::CaptureStdout();
-    locacao.exibirDetalhes();
-    std::string output = testing::internal::GetCapturedStdout();
-
-    EXPECT_NE(output.find("Locacao ID: 1"), std::string::npos);
-    EXPECT_NE(output.find("Cliente: Naruto Uzumaki"), std::string::npos);
-    EXPECT_NE(output.find("Nao devolvido"), std::string::npos);
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
 
