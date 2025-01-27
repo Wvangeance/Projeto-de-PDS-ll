@@ -11,19 +11,19 @@ public:
 
 // Teste para validar o construtor da classe Cliente
 TEST(ClienteTest, Construtor) {
-    Cliente cliente(1, "Joao Silva", "123456789");
+    Cliente cliente(1, "Naruto Uzumaki", "123456789");
     EXPECT_EQ(cliente.id, 1);
-    EXPECT_EQ(cliente.nome, "Joao Silva");
+    EXPECT_EQ(cliente.nome, "Naruto Uzumaki");
     EXPECT_EQ(cliente.telefone, "123456789");
 }
 
 // Teste para validar o construtor da classe Locacao
 TEST(LocacaoTest, Construtor) {
-    Cliente cliente(1, "Joao Silva", "123456789");
+    Cliente cliente(1, "Naruto Uzumaki", "123456789");
     Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
 
     EXPECT_EQ(locacao.id, 1);
-    EXPECT_EQ(locacao.cliente.nome, "Joao Silva");
+    EXPECT_EQ(locacao.cliente.nome, "Naruto Uzumaki");
     EXPECT_EQ(locacao.dataLocacao, "01/01/2023");
     EXPECT_EQ(locacao.dataDevolucao, "10/01/2023");
     EXPECT_FALSE(locacao.devolvido);
@@ -31,7 +31,7 @@ TEST(LocacaoTest, Construtor) {
 
 // Teste para validar o método marcarComoDevolvido
 TEST(LocacaoTest, MarcarComoDevolvido) {
-    Cliente cliente(1, "Joao Silva", "123456789");
+    Cliente cliente(1, "Naruto Uzumaki", "123456789");
     Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
 
     locacao.marcarComoDevolvido();
@@ -41,13 +41,13 @@ TEST(LocacaoTest, MarcarComoDevolvido) {
 // Teste para carregar usuários com sucesso
 TEST(UtilityTest, CarregarUsuarios) {
     std::ofstream arquivo("usuarios_mock.txt");
-    arquivo << "1;Joao Silva;123456789\n";
-    arquivo << "2;Maria Oliveira;987654321\n";
+    arquivo << "1;Naruto Uzumaki;123456789\n";
+    arquivo << "2;Sakura Haruno;987654321\n";
     arquivo.close();
 
     std::vector<Cliente> clientes = carregarUsuarios("usuarios_mock.txt");
     EXPECT_EQ(clientes.size(), 2);
-    EXPECT_EQ(clientes[0].nome, "Joao Silva");
+    EXPECT_EQ(clientes[0].nome, "Naruto Uzumaki");
     EXPECT_EQ(clientes[1].telefone, "987654321");
 
     std::remove("usuarios_mock.txt"); // Remover arquivo mock após teste
@@ -70,7 +70,7 @@ TEST(UtilityTest, CarregarFilmes) {
 
 // Teste para verificar exibição de detalhes de locação
 TEST(LocacaoTest, ExibirDetalhes) {
-    Cliente cliente(1, "Joao Silva", "123456789");
+    Cliente cliente(1, "Naruto Uzumaki", "123456789");
     Locacao locacao(1, cliente, "01/01/2023", "10/01/2023");
 
     testing::internal::CaptureStdout();
@@ -78,7 +78,7 @@ TEST(LocacaoTest, ExibirDetalhes) {
     std::string output = testing::internal::GetCapturedStdout();
 
     EXPECT_NE(output.find("Locacao ID: 1"), std::string::npos);
-    EXPECT_NE(output.find("Cliente: Joao Silva"), std::string::npos);
+    EXPECT_NE(output.find("Cliente: Naruto Uzumaki"), std::string::npos);
     EXPECT_NE(output.find("Nao devolvido"), std::string::npos);
 }
 
@@ -86,3 +86,4 @@ int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
