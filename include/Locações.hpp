@@ -2,41 +2,44 @@
 #define LOCACAO_HPP
 
 #include <string>
-#include <vector>
+#include "Cliente.hpp"
+#include "Filmes.hpp"
 
-// Classe Cliente
-class Cliente {
-public:
-    int id;
-    std::string nome;
-    std::string telefone;
-
-    // Construtor
-    Cliente(int id, const std::string& nome, const std::string& telefone);
-};
-
-// Classe Locacao
 class Locacao {
-public:
-    int id;
-    Cliente cliente;
+private:
+    Pessoa cliente;
+    Filme filme;
     std::string dataLocacao;
     std::string dataDevolucao;
-    bool devolvido;
 
-    // Construtor
-    Locacao(int id, Cliente cliente, const std::string& dataLocacao, const std::string& dataDevolucao);
+public:
+    // Construtores
+    Locacao();  // Construtor padrão
+    Locacao(const Pessoa& cliente, const Filme& filme, const std::string& dataLocacao, const std::string& dataDevolucao);
+    
+    // Semântica de cópia
+    Locacao(const Locacao& other);
+    Locacao& operator=(const Locacao& other);
 
-    // Métodos
-    void marcarComoDevolvido();
-    void exibirDetalhes() const;
+    // Semântica de movimentação
+    Locacao(Locacao&& other) noexcept;
+    Locacao& operator=(Locacao&& other) noexcept;
+
+    // Destrutor
+    ~Locacao();
+
+    // Getters e Setters
+    const Pessoa& getCliente() const;
+    void setCliente(const Pessoa& cliente);
+
+    const Filme& getFilme() const;
+    void setFilme(const Filme& filme);
+
+    const std::string& getDataLocacao() const;
+    void setDataLocacao(const std::string& dataLocacao);
+
+    const std::string& getDataDevolucao() const;
+    void setDataDevolucao(const std::string& dataDevolucao);
 };
 
-// Funções utilitárias
-std::vector<Cliente> carregarUsuarios(const std::string& nomeArquivo);
-std::vector<std::string> carregarFilmes(const std::string& nomeArquivo);
-
-// Menu principal
-void menuGerenciamentoLocacoes();
-
-#endif // LOCACAO_HPP
+#endif
