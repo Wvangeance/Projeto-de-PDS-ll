@@ -1,164 +1,75 @@
-#include <iostream> 
-#include <iomanip>
-#include <fstream>
-#include <algorithm>
-#include "Locacao.hpp"
+#include "Locações.hpp"
+#include <utility>
 
-// Implementação do construtor da classe Cliente
-Cliente::Cliente(int id, const std::string& nome, const std::string& telefone)
-    : id(id), nome(nome), telefone(telefone) {}
+// Construtor padrão
+Locacao::Locacao() : cliente(Pessoa()), filme(Filme()), dataLocacao(""), dataDevolucao("") {}
 
-// Implementação do construtor da classe Locacao
-Locacao::Locacao(int id, Cliente cliente, const std::string& dataLocacao, const std::string& dataDevolucao)
-    : id(id), cliente(cliente), dataLocacao(dataLocacao), dataDevolucao(dataDevolucao), devolvido(false) {}
+// Construtor parametrizado
+Locacao::Locacao(const Pessoa& cliente, const Filme& filme, const std::string& dataLocacao, const std::string& dataDevolucao)
+    : cliente(cliente), filme(filme), dataLocacao(dataLocacao), dataDevolucao(dataDevolucao) {}
 
-// Método para marcar a locação como devolvida
-void Locacao::marcarComoDevolvido() {
-    devolvido = true;
-}
+// Construtor de cópia
+Locacao::Locacao(const Locacao& other)
+    : cliente(other.cliente), filme(other.filme), dataLocacao(other.dataLocacao), dataDevolucao(other.dataDevolucao) {}
 
-// Método para exibir os detalhes da locação
-void Locacao::exibirDetalhes() const {
-    std::cout << "Locacao ID: " << id << "\n";
-    std::cout << "Cliente: " << cliente.nome << " (Telefone: " << cliente.telefone << ")\n";
-    std::cout << "Data de Locacao: " << dataLocacao << "\n";
-    std::cout << "Data de Devolucao: " << dataDevolucao << "\n";
-    std::cout << "Status: " << (devolvido ? "Devolvido" : "Nao devolvido") << "\n";
-    std::cout << "-----------------------------\n";
-}
-
-// Função para carregar dados de usuários de um arquivo
-std::vector<Cliente> carregarUsuarios(const std::string& nomeArquivo) {
-    std::vector<Cliente> usuarios;
-    std::ifstream arquivo(nomeArquivo);
-
-    if (arquivo.is_open()) {
-        int id;
-        std::string nome, telefone;
-
-        while (arquivo >> id) {
-            arquivo.ignore(); // Ignorar espaço ou separador
-            std::getline(arquivo, nome, ';');
-            std::getline(arquivo, telefone);
-            usuarios.emplace_back(id, nome, telefone);
-        }
-
-        arquivo.close();
-        std::cout << "Usuarios carregados do arquivo: " << nomeArquivo << "\n";
-    } else {
-        std::cout << "Arquivo de usuarios nao encontrado. Entrada manual sera usada.\n";
+// Operador de atribuição por cópia
+Locacao& Locacao::operator=(const Locacao& other) {
+    if (this != &other) {
+        cliente = other.cliente;
+        filme = other.filme;
+        dataLocacao = other.dataLocacao;
+        dataDevolucao = other.dataDevolucao;
     }
-
-    return usuarios;
+    return *this;
 }
 
-// Função para carregar dados de filmes de um arquivo
-std::vector<std::string> carregarFilmes(const std::string& nomeArquivo) {
-    std::vector<std::string> filmes;
-    std::ifstream arquivo(nomeArquivo);
+// Construtor de movimentação
+Locacao::Locacao(Locacao&& other) noexcept
+    : cliente(std::move(other.cliente)), filme(std::move(other.filme)), dataLocacao(std::move(other.dataLocacao)), dataDevolucao(std::move(other.dataDevolucao)) {}
 
-    if (arquivo.is_open()) {
-        std::string filme;
-
-        while (std::getline(arquivo, filme)) {
-            filmes.push_back(filme);
-        }
-
-        arquivo.close();
-        std::cout << "Filmes carregados do arquivo: " << nomeArquivo << "\n";
-    } else {
-        std::cout << "Arquivo de filmes nao encontrado. Entrada manual sera usada.\n";
+// Operador de atribuição por movimentação
+Locacao& Locacao::operator=(Locacao&& other) noexcept {
+    if (this != &other) {
+        cliente = std::move(other.cliente);
+        filme = std::move(other.filme);
+        dataLocacao = std::move(other.dataLocacao);
+        dataDevolucao = std::move(other.dataDevolucao);
     }
-
-    return filmes;
+    return *this;
 }
 
-// Função principal para gerenciar o sistema
-void menuGerenciamentoLocacoes() {
-    std::vector<Cliente> usuarios = carregarUsuarios("usuarios.txt");
-    std::vector<std::string> filmes = carregarFilmes("filmes.txt");
-    std::vector<Locacao> locacoes;
+// Destrutor
+Locacao::~Locacao() {}
 
-    int escolha;
-    do {
-        std::cout << "\nSistema de Gerenciamento de Locacoes\n";
-        std::cout << "1. Criar Nova Locacao\n";
-        std::cout << "2. Listar Locacoes\n";
-        std::cout << "3. Atualizar Status de Devolucao\n";
-        std::cout << "4. Sair\n";
-        std::cout << "Escolha uma opcao: ";
-        std::cin >> escolha;
-
-        if (escolha == 1) {
-            int clienteId;
-            std::string clienteNome, clienteTelefone, dataLocacao, dataDevolucao;
-
-            if (!usuarios.empty()) {
-                std::cout << "Clientes disponiveis:\n";
-                for (const auto& usuario : usuarios) {
-                    std::cout << usuario.id << ": " << usuario.nome << " (" << usuario.telefone << ")\n";
-                }
-                std::cout << "Informe o ID do Cliente: ";
-                std::cin >> clienteId;
-
-                auto it = std::find_if(usuarios.begin(), usuarios.end(),
-                                       [clienteId](const Cliente& c) { return c.id == clienteId; });
-
-                if (it != usuarios.end()) {
-                    clienteNome = it->nome;
-                    clienteTelefone = it->telefone;
-                } else {
-                    std::cout << "Cliente nao encontrado. Entrada manual sera usada.\n";
-                    std::cin.ignore(); // Limpar buffer do cin
-                    std::cout << "Informe o Nome do Cliente: ";
-                    std::getline(std::cin, clienteNome);
-                    std::cout << "Informe o Telefone do Cliente: ";
-                    std::getline(std::cin, clienteTelefone);
-                }
-            } else {
-                std::cin.ignore(); // Limpar buffer do cin
-                std::cout << "Informe o Nome do Cliente: ";
-                std::getline(std::cin, clienteNome);
-                std::cout << "Informe o Telefone do Cliente: ";
-                std::getline(std::cin, clienteTelefone);
-            }
-
-            Cliente cliente(clienteId, clienteNome, clienteTelefone);
-
-            std::cout << "Informe a data de locacao (dd/mm/aaaa): ";
-            std::cin >> dataLocacao;
-            std::cout << "Informe a data de devolucao (dd/mm/aaaa): ";
-            std::cin >> dataDevolucao;
-
-            locacoes.emplace_back(locacoes.size() + 1, cliente, dataLocacao, dataDevolucao);
-            std::cout << "Locacao criada com sucesso!\n";
-
-        } else if (escolha == 2) {
-            if (locacoes.empty()) {
-                std::cout << "Nenhuma locacao registrada.\n";
-            } else {
-                for (const auto& locacao : locacoes) {
-                    locacao.exibirDetalhes();
-                }
-            }
-
-        } else if (escolha == 3) {
-            int locacaoId;
-            std::cout << "Digite o ID da Locacao para marcar como devolvida: ";
-            std::cin >> locacaoId;
-
-            if (locacaoId <= 0 || locacaoId > static_cast<int>(locacoes.size())) {
-                std::cout << "ID de Locacao invalido.\n";
-            } else {
-                locacoes[locacaoId - 1].marcarComoDevolvido();
-                std::cout << "Status atualizado para devolvido.\n";
-            }
-        }
-    } while (escolha != 4);
+// Getters e Setters
+const Pessoa& Locacao::getCliente() const {
+    return cliente;
 }
 
-// Função principal
-int main() {
-    menuGerenciamentoLocacoes();
-    return 0;
+void Locacao::setCliente(const Pessoa& cliente) {
+    this->cliente = cliente;
+}
+
+const Filme& Locacao::getFilme() const {
+    return filme;
+}
+
+void Locacao::setFilme(const Filme& filme) {
+    this->filme = filme;
+}
+
+const std::string& Locacao::getDataLocacao() const {
+    return dataLocacao;
+}
+
+void Locacao::setDataLocacao(const std::string& dataLocacao) {
+    this->dataLocacao = dataLocacao;
+}
+
+const std::string& Locacao::getDataDevolucao() const {
+    return dataDevolucao;
+}
+
+void Locacao::setDataDevolucao(const std::string& dataDevolucao) {
+    this->dataDevolucao = dataDevolucao;
 }
