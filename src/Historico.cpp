@@ -13,7 +13,7 @@ std::cout<<"- "<<atividade<<"\n";
 }
 }
 
-\\Salvar histórico
+//Salvar histórico
 void Historico::salvarHistoricoEmArquivo(const std::string& nomeArquivo) const {
   std::ofstream arquivo(nomeArquivo);
 if (arquivo.is_open()) {
