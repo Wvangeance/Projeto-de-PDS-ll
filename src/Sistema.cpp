@@ -4,10 +4,12 @@
 
 void Sistema::adicionarFilme(const Filme& filme) {
     filmes.push_back(filme);
+    registrarAtividade("Filme adicionado: " + filme.getTitulo());
 }
 
 void Sistema::adicionarCliente(const Pessoa& cliente) {
     clientes.push_back(cliente);
+    registrarAtividade("Cliente adicionado: " + filme.getTitulo());
 }
 
 void Sistema::listarFilmes() const {
@@ -37,6 +39,7 @@ void Sistema::realizarLocacao(int idCliente, int idFilme, const std::string& dat
         locacoes.emplace_back(proxIdLocacao++, *itCliente, dataLocacao, dataDevolucao);
         itFilme->exibirInformacoes();
         std::cout << "Locação realizada com sucesso!\n";
+        registrarAtividade("Locação realizada: Cliete " + itCliente->nome + ", Filme " + itFilme->getTitulo());
     } else {
         std::cout << "Locação não pôde ser realizada. Cliente ou filme inválido.\n";
     }
@@ -44,14 +47,31 @@ void Sistema::realizarLocacao(int idCliente, int idFilme, const std::string& dat
 
 void Sistema::registrarPagamento(int idCliente, double valor, const std::string& dataPagamento) {
     auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Pessoa& cliente) {
-        return idCliente;
+        return cliente.id == idCliente;
     });
 
     if (itCliente != clientes.end()) {
         pagamentos.emplace_back(std::make_unique<PagamentoDinheiro>());
         pagamentos.back()->realizarPagamento(valor, true);
         std::cout << "Pagamento no valor de R$" << valor << " registrado com sucesso para o cliente: " << itCliente->nome << "\n";
+        registrarAtividade("Pagamento registrado: Cliente " + itCliente->nome + ", Valor: R$" + std::to_string(valor));
     } else {
         std::cout << "Cliente não encontrado.\n";
     }
+}
+
+void Sistema::registrarAtividades(const std::string& atividade) {
+    historico.adicionarAtividade(atividade);
+}
+
+void Sistema::exibirHistoricoDeAtividade() const {
+    historico.listarAtividade();
+}
+
+void Sistema::salvarHistorico(const std::string& nomeArquivo) const {
+    historico.salvarHistoricoEmArquivo(nomeArquivo);
+}
+
+void Sistema::carregarHistorico(const std::string& nomeArquivo) {
+    historico.carregarHistoricoDeArquivo(nomeArquivo);
 }
