@@ -5,7 +5,7 @@ void Sistema::adicionarFilme(const Filme& filme) {
     filmes.push_back(filme);
 }
 
-void Sistema::adicionarCliente(const Cliente& cliente) {
+void Sistema::adicionarCliente(const Pessoa& cliente) {
     clientes.push_back(cliente);
 }
 
@@ -24,7 +24,7 @@ void Sistema::listarFilmes() const {
 }
 
 void Sistema::realizarLocacao(int idCliente, int idFilme, const std::string& dataLocacao, const std::string& dataDevolucao) {
-    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Cliente& cliente) {
+    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Pessoa& cliente) {
         return cliente.id == idCliente;
     });
 
@@ -42,8 +42,8 @@ void Sistema::realizarLocacao(int idCliente, int idFilme, const std::string& dat
 }
 
 void Sistema::registrarPagamento(int idCliente, double valor, const std::string& dataPagamento) {
-    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Cliente& cliente) {
-        return cliente.id == idCliente;
+    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Pessoa& cliente) {
+        return idCliente;
     });
 
     if (itCliente != clientes.end()) {
