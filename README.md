@@ -40,4 +40,4 @@ O projeto foi planejado para ser modular e escalável, permitindo futuras expans
 - **include/**        (Para conter arquivos de cabeçalho .hpp)
 - **src/**            (Para conter arquivos fonte .cpp)
 - **tests/**          (Para conter arquivos de testes)   
-- **docs**            (Para conter arquivos de documentação)
+- **docs/**            (Para conter arquivos de documentação)
