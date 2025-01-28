@@ -9,7 +9,7 @@
 class Sistema {
 private:
     std::vector<Filme> filmes;
-    std::vector<Cliente> clientes;
+    std::vector<Pessoa> clientes;
     std::vector<Locacao> locacoes;
     std::vector<Pagamento> pagamentos;
 
@@ -19,7 +19,7 @@ private:
 public:
     // Métodos para adicionar entidades
     void adicionarFilme(const Filme& filme);
-    void adicionarCliente(const Cliente& cliente);
+    void adicionarCliente(const Pessoa& cliente);
 
     // Métodos para listar
     void listarFilmes() const;
