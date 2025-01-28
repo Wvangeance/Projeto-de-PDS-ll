@@ -39,4 +39,5 @@ O projeto foi planejado para ser modular e escalável, permitindo futuras expans
 ## Estrutura de diretórios
 - **include/**        (Para conter arquivos de cabeçalho .hpp)
 - **src/**            (Para conter arquivos fonte .cpp)
-- **tests/**          (Para conter arquivos de testes)
+- **tests/**          (Para conter arquivos de testes)   
+- **docs**            (Para conter arquivos de documentação)
