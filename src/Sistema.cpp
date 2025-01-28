@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "Sistema.hpp"
+#include <iostream>
 
 void Sistema::adicionarFilme(const Filme& filme) {
     filmes.push_back(filme);
