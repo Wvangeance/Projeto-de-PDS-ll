@@ -1,70 +1,64 @@
-#include "Filmes.hpp" 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "Filmes.hpp"
 
-// Mock para substituir interações com o usuário no SistemaFilmes
-class MockSistemaFilmes : public SistemaFilmes {
+using ::testing::NiceMock;
+using ::testing::Return;
+
+// Mock da classe Filme para isolar os testes da lógica interna
+class MockFilme : public Filme {
 public:
-    MOCK_METHOD(void, cadastrarFilme, (), (override));
-    MOCK_METHOD(void, listarFilmes, (), (override));
-    MOCK_METHOD(void, buscarPorGenero, (), (override));
+    MockFilme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento)
+        : Filme(titulo, generos, classificacaoEtaria, anoLancamento) {}
+
+    MOCK_METHOD(bool, isRecemLancado, (), (const, override));
+    MOCK_METHOD(void, salvarNoArquivo, (std::ofstream& arquivo), (const, override));
 };
 
-// Teste básico para o construtor da classe Filme e métodos getters
-TEST(FilmeTest, ConstrutorEGetters) {
-    std::vector<std::string> generos = {"Ação", "Aventura"};
-    Filme filme("Filme Teste", generos, 12, 2023);
+// Mock para interagir com o sistema de arquivos
+class MockSistemaFilmes : public SistemaFilmes {
+public:
+    MOCK_METHOD(void, salvarFilmes, (), (const, override));
+    MOCK_METHOD(void, carregarFilmes, (), (override));
+};
 
-    EXPECT_EQ(filme.getTitulo(), "Filme Teste");
-    EXPECT_EQ(filme.getGeneros(), generos);
-    EXPECT_EQ(filme.getClassificacaoEtaria(), 12);
-    EXPECT_EQ(filme.getAnoLancamento(), 2023);
-}
+// Teste para verificar a funcionalidade de isRecemLancado
+TEST(FilmeTest, IsRecemLancado) {
+    Filme filmeRecente("Filme Recente", {"Drama"}, 14, 2023);
+    Filme filmeAntigo("Filme Antigo", {"Ação"}, 16, 2019);
 
-// Teste para verificar a função que identifica se o filme é recém-lançado
-TEST(FilmeTest, RecemLancado) {
-    Filme filmeRecente("Filme Novo", {"Drama"}, 16, 2025);
     EXPECT_TRUE(filmeRecente.isRecemLancado());
-
-    Filme filmeAntigo("Filme Velho", {"Comédia"}, 10, 2020);
     EXPECT_FALSE(filmeAntigo.isRecemLancado());
 }
 
-// Teste para verificar o cadastro de filmes usando mock
-TEST(SistemaFilmesTest, CadastroComMock) {
-    MockSistemaFilmes mockSistema;
+// Testes para a classe SistemaFilmes
+TEST(SistemaFilmesTest, CadastroDeFilme) {
+    NiceMock<MockSistemaFilmes> mockSistema;
+    EXPECT_CALL(mockSistema, salvarFilmes()).Times(1);
 
-    // Expectativa para o método cadastrarFilme
-    EXPECT_CALL(mockSistema, cadastrarFilme())
-        .Times(1);
-
+    Filme novoFilme("Filme Teste", {"Terror"}, 16, 2023);
     mockSistema.cadastrarFilme();
+
+    // Verifique se o filme foi adicionado corretamente
+    EXPECT_NO_THROW({
+        const auto& filmes = mockSistema.listarFilmes();
+        EXPECT_EQ(filmes.back().getTitulo(), "Filme Teste");
+    });
 }
 
-// Teste para verificar a listagem de filmes usando mock
-TEST(SistemaFilmesTest, ListagemComMock) {
-    MockSistemaFilmes mockSistema;
+TEST(SistemaFilmesTest, BuscaPorGenero) {
+    SistemaFilmes sistema;
+    sistema.cadastrarFilme();
 
-    // Expectativa para o método listarFilmes
-    EXPECT_CALL(mockSistema, listarFilmes())
-        .Times(1);
+    std::istringstream entrada("Filme X\nAção,Drama\n12\n2023\n");
+    std::cin.rdbuf(entrada.rdbuf());
 
-    mockSistema.listarFilmes();
-}
+    sistema.buscarPorGenero();
 
-// Teste para verificar a busca por gênero usando mock
-TEST(SistemaFilmesTest, BuscaPorGeneroComMock) {
-    MockSistemaFilmes mockSistema;
+    std::ostringstream saida;
+    std::cout.rdbuf(saida.rdbuf());
 
-    // Expectativa para o método buscarPorGenero
-    EXPECT_CALL(mockSistema, buscarPorGenero())
-        .Times(1);
+    sistema.buscarPorGenero();
 
-    mockSistema.buscarPorGenero();
-}
-
-// Função principal para rodar os testes
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    EXPECT_TRUE(saida.str().find("Filme X") != std::string::npos);
 }

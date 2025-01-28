@@ -19,6 +19,9 @@ public:
     void cadastrarNoArquivo();
     void listarArquivo();
     void editarPermissaoLocacao();
+    
+    // Método getter para o nome
+    std::string getNome() const;
 };
 
 #endif

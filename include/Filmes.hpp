@@ -1,5 +1,5 @@
-#ifndef SISTEMA_FILMES_H
-#define SISTEMA_FILMES_H
+#ifndef FILMES_HPP
+#define FILMES_HPP
 
 #include <iostream>
 #include <string>
@@ -14,14 +14,18 @@ private:
     std::vector<std::string> generos;
     int classificacaoEtaria;
     int anoLancamento;
+    double preco; // Novo atributo
 
 public:
-    Filme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento);
+    Filme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento, double preco);
 
     std::string getTitulo() const;
     std::vector<std::string> getGeneros() const;
     int getClassificacaoEtaria() const;
     int getAnoLancamento() const;
+    double getPreco() const; // Getter para preço
+    void setPreco(double preco); // Setter para preço
+
     bool isRecemLancado() const;
 
     void exibirInformacoes() const;
@@ -47,4 +51,4 @@ public:
     void alterarOuExcluirFilme();
 };
 
-#endif // SISTEMA_FILMES_H
+#endif // FILMES_HPP

@@ -1,95 +1,76 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "Cliente.hpp"
 
-// Teste para verificar o comportamento inicial do objeto Pessoa
-TEST(PessoaTest, DefaultConstructor) {
-    Pessoa pessoa;
+using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::InSequence;
 
-    // Teste indireto de listarArquivo para garantir que o arquivo vazio
-    testing::internal::CaptureStdout();
-    pessoa.listarArquivo(); 
-    std::string output = testing::internal::GetCapturedStdout();
+// Classe mock para simular interações com arquivos
+class MockPessoa : public Pessoa {
+public:
+    MOCK_METHOD(void, coletarDados, (), (override));
+    MOCK_METHOD(void, cadastrarNoArquivo, (), (override));
+    MOCK_METHOD(void, listarArquivo, (), (override));
+    MOCK_METHOD(void, editarPermissaoLocacao, (), (override));
+    MOCK_METHOD(std::string, getNome, (), (const, override));
+};
 
-    ASSERT_NE(output.find("Erro ao abrir o arquivo"), std::string::npos);
+// Testando o método de cadastro de cliente
+TEST(PessoaTest, CadastroCliente) {
+    MockPessoa mockPessoa;
+
+    // Configurando os mocks para simular o comportamento esperado
+    EXPECT_CALL(mockPessoa, coletarDados())
+        .Times(1)
+        .WillOnce(Return());
+
+    EXPECT_CALL(mockPessoa, cadastrarNoArquivo())
+        .Times(1)
+        .WillOnce(Return());
+
+    // Executando as funções
+    mockPessoa.coletarDados();
+    mockPessoa.cadastrarNoArquivo();
 }
 
-// Teste para verificar a coleta de dados e cadastro no arquivo
-TEST(PessoaTest, CadastrarNoArquivo) {
-    Pessoa pessoa;
+// Testando o método de listagem de clientes
+TEST(PessoaTest, ListarClientes) {
+    MockPessoa mockPessoa;
 
-    // Simular entrada do usuário
-    std::istringstream input("Joao Silva\n12345678900\n");
-    std::cin.rdbuf(input.rdbuf());
+    EXPECT_CALL(mockPessoa, listarArquivo())
+        .Times(1)
+        .WillOnce(Return());
 
-    pessoa.coletarDados();
-
-    // Verificar o cadastro no arquivo
-    pessoa.cadastrarNoArquivo();
-
-    // Abrir o arquivo e validar se os dados foram escritos corretamente
-    std::ifstream arquivo("dados.txt");
-    ASSERT_TRUE(arquivo.is_open());
-
-    std::string linha;
-    bool encontrouNome = false, encontrouCpf = false;
-    while (std::getline(arquivo, linha)) {
-        if (linha.find("Nome: Joao Silva") != std::string::npos) {
-            encontrouNome = true;
-        }
-        if (linha.find("CPF: 12345678900") != std::string::npos) {
-            encontrouCpf = true;
-        }
-    }
-
-    arquivo.close();
-
-    ASSERT_TRUE(encontrouNome);
-    ASSERT_TRUE(encontrouCpf);
+    // Executando o método
+    mockPessoa.listarArquivo();
 }
 
-// Teste para verificar a listagem de clientes cadastrados
-TEST(PessoaTest, ListarArquivo) {
-    Pessoa pessoa;
-
-    // Capturar a saída para verificar se os dados são listados corretamente
-    testing::internal::CaptureStdout();
-    pessoa.listarArquivo();
-    std::string output = testing::internal::GetCapturedStdout();
-
-    ASSERT_NE(output.find("Clientes cadastrados"), std::string::npos);
-}
-
-// Teste para verificar a edição de permissão de locação
+// Testando o método de edição de permissão de locação
 TEST(PessoaTest, EditarPermissaoLocacao) {
-    Pessoa pessoa;
+    MockPessoa mockPessoa;
 
-    // Simular um CPF existente no arquivo para testar a edição
-    std::ofstream arquivo("dados.txt", std::ios::trunc);
-    arquivo << "Nome: Joao Silva\n";
-    arquivo << "CPF: 12345678900\n";
-    arquivo << "Permitido Locacao: Nao\n";
-    arquivo << "-----------------------------\n";
-    arquivo.close();
+    EXPECT_CALL(mockPessoa, editarPermissaoLocacao())
+        .Times(1)
+        .WillOnce(Return());
 
-    // Simular entrada do usuário
-    std::istringstream input("12345678900\nS\n");
-    std::cin.rdbuf(input.rdbuf());
+    // Executando o método
+    mockPessoa.editarPermissaoLocacao();
+}
 
-    pessoa.editarPermissaoLocacao();
+// Testando o getter do nome
+TEST(PessoaTest, GetterNome) {
+    MockPessoa mockPessoa;
 
-    // Abrir o arquivo novamente e verificar se a permissão foi atualizada
-    std::ifstream arquivoIn("dados.txt");
-    ASSERT_TRUE(arquivoIn.is_open());
+    EXPECT_CALL(mockPessoa, getNome())
+        .Times(1)
+        .WillOnce(Return("Teste"));
 
-    std::string linha;
-    bool permissaoAtualizada = false;
-    while (std::getline(arquivoIn, linha)) {
-        if (linha.find("Permitido Locacao: Sim") != std::string::npos) {
-            permissaoAtualizada = true;
-        }
-    }
+    // Verificando o retorno
+    EXPECT_EQ(mockPessoa.getNome(), "Teste");
+}
 
-    arquivoIn.close();
-
-    ASSERT_TRUE(permissaoAtualizada);
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

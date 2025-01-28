@@ -1,29 +1,41 @@
 #include "Cliente.hpp"
 
+// Construtor padrão
 Pessoa::Pessoa() : nome(""), cpf(""), permitidoLocacao(false) {}
 
+// Coletar dados do usuário
 void Pessoa::coletarDados() {
     std::cout << "Digite o nome da pessoa: ";
     std::getline(std::cin, nome);
 
-    std::cout << "Digite o CPF da pessoa (somente numeros): ";
+    std::cout << "Digite o CPF da pessoa (somente números): ";
     std::getline(std::cin, cpf);
+
+    char resposta;
+    std::cout << "Permitir locação? (S/N): ";
+    std::cin >> resposta;
+    permitidoLocacao = (resposta == 'S' || resposta == 's');
+
+    // Limpar buffer de entrada
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
+// Cadastrar dados no arquivo
 void Pessoa::cadastrarNoArquivo() {
     std::ofstream arquivo("dados.txt", std::ios::app);
     if (arquivo.is_open()) {
         arquivo << "Nome: " << nome << std::endl;
         arquivo << "CPF: " << cpf << std::endl;
-        arquivo << "Permitido Locacao: " << (permitidoLocacao ? "Sim" : "Nao") << std::endl;
+        arquivo << "Permitido Locação: " << (permitidoLocacao ? "Sim" : "Não") << std::endl;
         arquivo << "-----------------------------" << std::endl;
         arquivo.close();
-        std::cout << "Cadastro Realizado com sucesso!" << std::endl;
+        std::cout << "Cadastro realizado com sucesso!" << std::endl;
     } else {
         std::cerr << "Erro ao abrir o arquivo!" << std::endl;
     }
 }
 
+// Listar conteúdo do arquivo
 void Pessoa::listarArquivo() {
     std::ifstream arquivo("dados.txt");
     if (arquivo.is_open()) {
@@ -38,6 +50,7 @@ void Pessoa::listarArquivo() {
     }
 }
 
+// Editar permissão de locação
 void Pessoa::editarPermissaoLocacao() {
     std::string cpfBusca;
     std::cout << "Digite o CPF do cliente que deseja editar: ";
@@ -47,24 +60,23 @@ void Pessoa::editarPermissaoLocacao() {
     std::ostringstream temp;
     bool encontrado = false;
     std::string linha;
-    bool alterandoPermissao = false;
 
     if (arquivo.is_open()) {
         while (std::getline(arquivo, linha)) {
             temp << linha << std::endl;
 
-            if (linha.find(cpfBusca) != std::string::npos) {
+            if (linha.find("CPF: " + cpfBusca) != std::string::npos) {
                 encontrado = true;
 
                 char opcao;
-                std::cout << "O cliente está permitido a pegar locacao? (S para Sim, N para Nao): ";
+                std::cout << "O cliente está permitido a pegar locação? (S para Sim, N para Não): ";
                 std::cin >> opcao;
                 std::cin.ignore();
 
                 permitidoLocacao = (opcao == 'S' || opcao == 's');
+                temp << "Permitido Locação: " << (permitidoLocacao ? "Sim" : "Não") << std::endl;
 
-                temp << "Permitido Locacao: " << (permitidoLocacao ? "Sim" : "Nao") << std::endl;
-
+                // Pular a linha antiga do status no arquivo original
                 std::getline(arquivo, linha);
             }
         }
@@ -75,7 +87,7 @@ void Pessoa::editarPermissaoLocacao() {
             if (arquivoOut.is_open()) {
                 arquivoOut << temp.str();
                 arquivoOut.close();
-                std::cout << "Status de permissão de locacao atualizado com sucesso!" << std::endl;
+                std::cout << "Status de permissão de locação atualizado com sucesso!" << std::endl;
             } else {
                 std::cerr << "Erro ao abrir o arquivo para regravar!" << std::endl;
             }
@@ -86,38 +98,47 @@ void Pessoa::editarPermissaoLocacao() {
         std::cerr << "Erro ao abrir o arquivo!" << std::endl;
     }
 }
+
+// Getter para o nome
+std::string Pessoa::getNome() const {
+    return nome;
+}
+
+// Função principal
 int main() {
     Pessoa pessoa;
     int selecao;
+
     while (true) {
         std::cout << "\nMenu Principal - Sistema de Cadastro\n";
         std::cout << "1. Cadastrar Novo Cliente\n";
         std::cout << "2. Listar Clientes Cadastrados\n";
-        std::cout << "3. Editar Permissao de Locacao\n";
+        std::cout << "3. Editar Permissão de Locação\n";
         std::cout << "4. Sair\n";
-        std::cout << "Escolha uma opcao: ";
+        std::cout << "Escolha uma opção: ";
 
         while (!(std::cin >> selecao) || selecao < 1 || selecao > 4) {
-            std::cout << "Opcao invalida. Tente novamente: ";
+            std::cout << "Opção inválida. Tente novamente: ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (selecao) {
-        case 1:
-            pessoa.coletarDados();
-            pessoa.cadastrarNoArquivo();
-            break;
-        case 2:
-            pessoa.listarArquivo();
-            break;
-        case 3:
-            pessoa.editarPermissaoLocacao();
-            break;
-        case 4:
-            std::cout << "Encerrando o sistema. Ate mais!\n";
-            return 0;
+            case 1:
+                pessoa.coletarDados();
+                pessoa.cadastrarNoArquivo();
+                break;
+            case 2:
+                pessoa.listarArquivo();
+                break;
+            case 3:
+                pessoa.editarPermissaoLocacao();
+                break;
+            case 4:
+                std::cout << "Encerrando o sistema. Até mais!\n";
+                return 0;
         }
     }
 }
+

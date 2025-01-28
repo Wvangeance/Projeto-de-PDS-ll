@@ -2,21 +2,23 @@
 #define LOCACAO_HPP
 
 #include <string>
+#include <chrono>
+#include <iostream>
 #include "Cliente.hpp"
 #include "Filmes.hpp"
 
 class Locacao {
 private:
-    Pessoa cliente;
-    Filme filme;
-    std::string dataLocacao;
-    std::string dataDevolucao;
+    Pessoa cliente;              // Associado à classe Pessoa
+    Filme filme;                 // Associado à classe Filme
+    std::string dataLocacao;     // Data da locação (formato: "AAAA-MM-DD")
+    std::string dataDevolucao;   // Data de devolução esperada (formato: "AAAA-MM-DD")
 
 public:
     // Construtores
-    Locacao();  // Construtor padrão
+    Locacao();
     Locacao(const Pessoa& cliente, const Filme& filme, const std::string& dataLocacao, const std::string& dataDevolucao);
-    
+
     // Semântica de cópia
     Locacao(const Locacao& other);
     Locacao& operator=(const Locacao& other);
@@ -40,6 +42,11 @@ public:
 
     const std::string& getDataDevolucao() const;
     void setDataDevolucao(const std::string& dataDevolucao);
+
+    // Métodos adicionais
+    double getPreco() const;                            // Retorna o preço do filme associado à locação
+    int calcularDiasAtraso(const std::string& dataAtual) const; // Calcula os dias de atraso com base na data atual
+    void exibirInformacoes() const;                    // Exibe detalhes da locação
 };
 
-#endif
+#endif // LOCACAO_HPP
