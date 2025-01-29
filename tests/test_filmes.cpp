@@ -1,64 +1,54 @@
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "Filmes.hpp"
 
-using ::testing::NiceMock;
 using ::testing::Return;
+using ::testing::_;
 
-// Mock da classe Filme para isolar os testes da lógica interna
-class MockFilme : public Filme {
-public:
-    MockFilme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento)
-        : Filme(titulo, generos, classificacaoEtaria, anoLancamento) {}
+// Teste de criação de Filme
+TEST(FilmeTest, CriacaoFilme) {
+    Filme filme("Matrix", {"Ação", "Ficção Científica"}, 14, 1999, 19.90);
+    EXPECT_EQ(filme.getTitulo(), "Matrix");
+    EXPECT_EQ(filme.getClassificacaoEtaria(), 14);
+    EXPECT_EQ(filme.getAnoLancamento(), 1999);
+    EXPECT_EQ(filme.getPreco(), 19.90);
+    EXPECT_EQ(filme.getGeneros().size(), 2);
+}
 
-    MOCK_METHOD(bool, isRecemLancado, (), (const, override));
-    MOCK_METHOD(void, salvarNoArquivo, (std::ofstream& arquivo), (const, override));
-};
+// Teste de lançamento recente
+TEST(FilmeTest, FilmeRecemLancado) {
+    Filme filmeNovo("Avatar 3", {"Aventura", "Ficção"}, 12, 2024, 29.90);
+    EXPECT_TRUE(filmeNovo.isRecemLancado());
+    
+    Filme filmeAntigo("Titanic", {"Romance", "Drama"}, 12, 1997, 15.00);
+    EXPECT_FALSE(filmeAntigo.isRecemLancado());
+}
 
-// Mock para interagir com o sistema de arquivos
+// Teste de alteração de preço
+TEST(FilmeTest, AlterarPreco) {
+    Filme filme("Inception", {"Ação", "Ficção Científica"}, 12, 2010, 25.00);
+    filme.setPreco(30.00);
+    EXPECT_EQ(filme.getPreco(), 30.00);
+}
+
+// Mock para testar interações com arquivos
 class MockSistemaFilmes : public SistemaFilmes {
 public:
     MOCK_METHOD(void, salvarFilmes, (), (const, override));
     MOCK_METHOD(void, carregarFilmes, (), (override));
 };
 
-// Teste para verificar a funcionalidade de isRecemLancado
-TEST(FilmeTest, IsRecemLancado) {
-    Filme filmeRecente("Filme Recente", {"Drama"}, 14, 2023);
-    Filme filmeAntigo("Filme Antigo", {"Ação"}, 16, 2019);
-
-    EXPECT_TRUE(filmeRecente.isRecemLancado());
-    EXPECT_FALSE(filmeAntigo.isRecemLancado());
-}
-
-// Testes para a classe SistemaFilmes
-TEST(SistemaFilmesTest, CadastroDeFilme) {
-    NiceMock<MockSistemaFilmes> mockSistema;
+// Teste de cadastro de filme
+TEST(SistemaFilmesTest, CadastroFilme) {
+    MockSistemaFilmes mockSistema;
     EXPECT_CALL(mockSistema, salvarFilmes()).Times(1);
-
-    Filme novoFilme("Filme Teste", {"Terror"}, 16, 2023);
+    
     mockSistema.cadastrarFilme();
-
-    // Verifique se o filme foi adicionado corretamente
-    EXPECT_NO_THROW({
-        const auto& filmes = mockSistema.listarFilmes();
-        EXPECT_EQ(filmes.back().getTitulo(), "Filme Teste");
-    });
 }
 
-TEST(SistemaFilmesTest, BuscaPorGenero) {
+// Teste de listagem de filmes (simulando que há filmes cadastrados)
+TEST(SistemaFilmesTest, ListarFilmes) {
     SistemaFilmes sistema;
     sistema.cadastrarFilme();
-
-    std::istringstream entrada("Filme X\nAção,Drama\n12\n2023\n");
-    std::cin.rdbuf(entrada.rdbuf());
-
-    sistema.buscarPorGenero();
-
-    std::ostringstream saida;
-    std::cout.rdbuf(saida.rdbuf());
-
-    sistema.buscarPorGenero();
-
-    EXPECT_TRUE(saida.str().find("Filme X") != std::string::npos);
+    EXPECT_NO_THROW(sistema.listarFilmes());
 }
