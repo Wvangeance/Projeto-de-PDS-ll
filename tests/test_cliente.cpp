@@ -2,72 +2,65 @@
 #include <gmock/gmock.h>
 #include "Cliente.hpp"
 
-using ::testing::AtLeast;
-using ::testing::Return;
-using ::testing::InSequence;
-
-// Classe mock para simular interações com arquivos
+// Classe mock para testar interações
 class MockPessoa : public Pessoa {
 public:
     MOCK_METHOD(void, coletarDados, (), (override));
     MOCK_METHOD(void, cadastrarNoArquivo, (), (override));
     MOCK_METHOD(void, listarArquivo, (), (override));
     MOCK_METHOD(void, editarPermissaoLocacao, (), (override));
-    MOCK_METHOD(std::string, getNome, (), (const, override));
 };
 
-// Testando o método de cadastro de cliente
-TEST(PessoaTest, CadastroCliente) {
+// Teste de inicialização da classe Pessoa
+TEST(PessoaTest, ConstrutorPadrao) {
+    Pessoa pessoa;
+    EXPECT_EQ(pessoa.getNome(), "");
+    EXPECT_EQ(pessoa.getId(), 0);
+}
+
+// Teste de coleta de dados simulada
+TEST(PessoaTest, ColetarDados) {
     MockPessoa mockPessoa;
-
-    // Configurando os mocks para simular o comportamento esperado
-    EXPECT_CALL(mockPessoa, coletarDados())
-        .Times(1)
-        .WillOnce(Return());
-
-    EXPECT_CALL(mockPessoa, cadastrarNoArquivo())
-        .Times(1)
-        .WillOnce(Return());
-
-    // Executando as funções
+    EXPECT_CALL(mockPessoa, coletarDados()).Times(1);
     mockPessoa.coletarDados();
-    mockPessoa.cadastrarNoArquivo();
 }
 
-// Testando o método de listagem de clientes
-TEST(PessoaTest, ListarClientes) {
-    MockPessoa mockPessoa;
+// Teste de escrita no arquivo
+TEST(PessoaTest, CadastrarNoArquivo) {
+    Pessoa pessoa;
+    std::ofstream arquivo("dados.txt", std::ios::trunc);
+    ASSERT_TRUE(arquivo.is_open());
+    arquivo.close();
 
-    EXPECT_CALL(mockPessoa, listarArquivo())
-        .Times(1)
-        .WillOnce(Return());
+    pessoa.cadastrarNoArquivo();
 
-    // Executando o método
-    mockPessoa.listarArquivo();
+    std::ifstream arquivoIn("dados.txt");
+    ASSERT_TRUE(arquivoIn.is_open());
+    std::stringstream buffer;
+    buffer << arquivoIn.rdbuf();
+    arquivoIn.close();
+    EXPECT_FALSE(buffer.str().empty());
 }
 
-// Testando o método de edição de permissão de locação
+// Teste de leitura do arquivo
+TEST(PessoaTest, ListarArquivo) {
+    Pessoa pessoa;
+    std::ofstream arquivo("dados.txt");
+    arquivo << "Nome: Teste\nCPF: 12345678900\nPermitido Locacao: Sim\nID: 1\n";
+    arquivo.close();
+
+    std::ifstream arquivoIn("dados.txt");
+    ASSERT_TRUE(arquivoIn.is_open());
+    arquivoIn.close();
+    
+    pessoa.listarArquivo();
+}
+
+// Teste de edição de permissão de locação simulada
 TEST(PessoaTest, EditarPermissaoLocacao) {
     MockPessoa mockPessoa;
-
-    EXPECT_CALL(mockPessoa, editarPermissaoLocacao())
-        .Times(1)
-        .WillOnce(Return());
-
-    // Executando o método
+    EXPECT_CALL(mockPessoa, editarPermissaoLocacao()).Times(1);
     mockPessoa.editarPermissaoLocacao();
-}
-
-// Testando o getter do nome
-TEST(PessoaTest, GetterNome) {
-    MockPessoa mockPessoa;
-
-    EXPECT_CALL(mockPessoa, getNome())
-        .Times(1)
-        .WillOnce(Return("Teste"));
-
-    // Verificando o retorno
-    EXPECT_EQ(mockPessoa.getNome(), "Teste");
 }
 
 int main(int argc, char **argv) {
