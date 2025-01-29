@@ -1,27 +1,36 @@
 #ifndef HISTORICO_HPP
 #define HISTORICO_HPP
 
-#include <string>
+#include "Cliente.hpp"
+#include "Locações.hpp"
+#include "Pagamento.hpp"
+#include "Filmes.hpp"
 #include <vector>
-#include <fstream>
-#include <iostream>
+#include <map>
+#include <string>
 
 class Historico {
 private:
-std::vector<std::string> atividades;
+    std::vector<Locacao> locacoes; // Registro de todas as locações realizadas
+    std::vector<Pagamento> pagamentos; // Histórico de pagamentos efetuados e pendências
+    std::map<int, Pessoa> clientes; // Dados de interação dos clientes, como locações e devoluções
+    std::map<std::string, int> estatisticasFilmes; // Contagem de filmes mais alugados
+    std::map<int, int> clientesFrequentes; // Contagem de locações por cliente
+
+    void atualizarEstatisticas(const Locacao& locacao); // Atualiza estatísticas ao registrar uma locação
+    void registrarPagamento(const Pagamento& pagamento); // Adiciona um novo pagamento no histórico
 
 public:
-//Adicionar atividade
-void adicionarAtividade(const std::string& atividade);
+    Historico();
 
-//Listar atividades
-void listarAtividades() const;
+    void registrarLocacao(const Locacao& locacao); // Adiciona uma nova locação
+    void adicionarCliente(const Pessoa& cliente); // Adiciona um cliente no sistema
+    void adicionarFilme(const Filme& filme); // Adiciona um filme no sistema
+    void registrarPagamentoCliente(const Pagamento& pagamento); // Registra pagamento de um cliente
 
-//Salvar histórico 
-void salvarHistoricoEmArquivo(const std::string& nomeArquivo) const;
-
-//Carregar histórico 
-void carregarHistoricoDeArquivo(const std::string& nomeArquivo);
+    void gerarRelatorio(const std::string& tipo); // Gera relatórios personalizados
+    void gerarRelatorioFilmesMaisAlugados(); // Relatório de filmes mais alugados
+    void consultarAtividade(int clienteId); // Exibe histórico detalhado de um cliente específico
 };
 
-#endif // HISTORICO_HPP
+#endif //HISTORICO_HPP
