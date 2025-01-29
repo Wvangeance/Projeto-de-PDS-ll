@@ -1,27 +1,29 @@
-#ifndef CLIENTE_HPP
-#define CLIENTE_HPP
+    #ifndef CLIENTE_HPP
+    #define CLIENTE_HPP
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <limits>
+    #include <iostream>
+    #include <string>
+    #include <fstream>
+    #include <sstream>
+    #include <limits>
 
-class Pessoa {
-private:
-    std::string nome;
-    std::string cpf;
-    bool permitidoLocacao;
+    class Pessoa {
+    private:
+        std::string nome;
+        std::string cpf;
+        bool permitidoLocacao;
+        int id;
 
-public:
-    Pessoa();
-    void coletarDados();
-    void cadastrarNoArquivo();
-    void listarArquivo();
-    void editarPermissaoLocacao();
-    
-    // Método getter para o nome
-    std::string getNome() const;
-};
+    public:
+        Pessoa();
+        void coletarDados();
+        void cadastrarNoArquivo();
+        void listarArquivo();
+        void editarPermissaoLocacao();
+        
+        // Método getter para o nome
+        std::string getNome() const;
+        int getId() const;
+    };
 
-#endif
+    #endif
