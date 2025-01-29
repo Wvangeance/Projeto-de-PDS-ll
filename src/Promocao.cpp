@@ -1,4 +1,4 @@
-#include "Promoção.hpp"
+#include "Promocao.hpp"
 #include <iostream>
 
 Promocao::Promocao(const std::string& desc, const std::string& tipo, double valor, 
@@ -31,5 +31,5 @@ void Promocao::exibirDetalhes() const {
     for (int id : clientes_aplicados) {
         std::cout << id << " ";
     }
-    std::cout << std::endl;
+    std::cout<<std::endl;
 }
