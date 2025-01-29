@@ -3,9 +3,9 @@
 
 #include "Filmes.hpp"
 #include "Cliente.hpp"
-#include "Locações.hpp"
+#include "Locacoes.hpp"
 #include "Pagamento.hpp"
-#include "Histórico.hpp"
+#include "Historico.hpp"
 
 class Sistema {
 private:
