@@ -8,10 +8,7 @@
 #include "Locacoes.hpp"
 #include "Pagamento.hpp"
 #include "Historico.hpp"
-<<<<<<< HEAD
-#include "Promoção.hpp"
-=======
->>>>>>> a63bd99089e38fa06d6f4b5a2fc40c1b496cce66
+#include "Promocao.hpp"
 
 class Sistema {
 private:
