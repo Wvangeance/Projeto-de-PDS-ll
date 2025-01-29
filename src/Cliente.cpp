@@ -1,7 +1,7 @@
 #include "Cliente.hpp"
 
 // Construtor padrão
-Pessoa::Pessoa() : nome(""), cpf(""), permitidoLocacao(false) {}
+Pessoa::Pessoa() : nome(""), cpf(""), permitidoLocacao(false), id(0) {} // Inicializando id
 
 // Coletar dados do usuário
 void Pessoa::coletarDados() {
@@ -18,6 +18,10 @@ void Pessoa::coletarDados() {
 
     // Limpar buffer de entrada
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
+    std::cout << "Digite o ID da pessoa: ";
+    std::cin >> id;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 // Cadastrar dados no arquivo
@@ -27,6 +31,7 @@ void Pessoa::cadastrarNoArquivo() {
         arquivo << "Nome: " << nome << std::endl;
         arquivo << "CPF: " << cpf << std::endl;
         arquivo << "Permitido Locação: " << (permitidoLocacao ? "Sim" : "Não") << std::endl;
+        arquivo << "ID: " << id << std::endl; // Adicionando o ID ao arquivo
         arquivo << "-----------------------------" << std::endl;
         arquivo.close();
         std::cout << "Cadastro realizado com sucesso!" << std::endl;
@@ -71,7 +76,7 @@ void Pessoa::editarPermissaoLocacao() {
                 char opcao;
                 std::cout << "O cliente está permitido a pegar locação? (S para Sim, N para Não): ";
                 std::cin >> opcao;
-                std::cin.ignore();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                 permitidoLocacao = (opcao == 'S' || opcao == 's');
                 temp << "Permitido Locação: " << (permitidoLocacao ? "Sim" : "Não") << std::endl;
@@ -102,6 +107,11 @@ void Pessoa::editarPermissaoLocacao() {
 // Getter para o nome
 std::string Pessoa::getNome() const {
     return nome;
+}
+
+// Getter para o ID
+int Pessoa::getId() const {
+    return id; // Adicionando o getter para o ID
 }
 
 // Função principal
