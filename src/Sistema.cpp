@@ -1,77 +1,129 @@
-#include <algorithm>
-#include "Sistema.hpp"
 #include <iostream>
+#include <vector>
+#include <string>
+#include <Sistema.hpp>
 
-void Sistema::adicionarFilme(const Filme& filme) {
-    filmes.push_back(filme);
-    registrarAtividade("Filme adicionado: " + filme.getTitulo());
-}
+// Classe Pessoa
+class Pessoa {
+public:
+    std::string nome;
+    Pessoa(std::string nome) : nome(nome) {}
+};
 
-void Sistema::adicionarCliente(const Pessoa& cliente) {
-    clientes.push_back(cliente);
-    registrarAtividade("Cliente adicionado: " + filme.getTitulo());
-}
+// Classe Filme
+class Filme {
+public:
+    std::string titulo;
+    int ano;
+    bool disponivel;
+    Filme(std::string titulo, int ano) : titulo(titulo), ano(ano), disponivel(true) {}
+};
 
-void Sistema::listarFilmes() const {
-    for (const auto& filme : filmes) {
-        std::cout << "Título: " << filme.getTitulo() 
-                  << ", Gêneros: ";
-        for (const auto& genero : filme.getGeneros()) {
-            std::cout << genero << " ";
+// Classe Historico
+class Historico {
+public:
+    std::vector<std::string> registros;
+    void adicionarRegistro(std::string registro) {
+        registros.push_back(registro);
+    }
+    void mostrarHistorico() {
+        for (const auto& registro : registros) {
+            std::cout << registro << std::endl;
         }
-        std::cout << ", Classificação Etária: " << filme.getClassificacaoEtaria()
-                  << ", Ano de Lançamento: " << filme.getAnoLancamento()
-                  << ", Disponível: " << (filme.isRecemLancado() ? "Sim" : "Não")
-                  << std::endl;
     }
-}
+};
 
-void Sistema::realizarLocacao(int idCliente, int idFilme, const std::string& dataLocacao, const std::string& dataDevolucao) {
-    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Pessoa& cliente) {
-        return cliente.id == idCliente;
-    });
-
-    auto itFilme = std::find_if(filmes.begin(), filmes.end(), [idFilme](const Filme& filme) {
-        return filme.getTitulo() == idFilme && filme.isRecemLancado();
-    });
-
-    if (itCliente != clientes.end() && itFilme != filmes.end()) {
-        locacoes.emplace_back(proxIdLocacao++, *itCliente, dataLocacao, dataDevolucao);
-        itFilme->exibirInformacoes();
-        std::cout << "Locação realizada com sucesso!\n";
-        registrarAtividade("Locação realizada: Cliete " + itCliente->nome + ", Filme " + itFilme->getTitulo());
-    } else {
-        std::cout << "Locação não pôde ser realizada. Cliente ou filme inválido.\n";
+// Classe Locacao
+class Locacao {
+public:
+    static void alugarFilme(Pessoa& cliente, Filme& filme, Historico& historico) {
+        if (filme.disponivel) {
+            filme.disponivel = false;
+            historico.adicionarRegistro(cliente.nome + " alugou o filme: " + filme.titulo);
+            std::cout << "Filme alugado com sucesso!\n";
+        } else {
+            std::cout << "Filme indisponível!\n";
+        }
     }
-}
 
-void Sistema::registrarPagamento(int idCliente, double valor, const std::string& dataPagamento) {
-    auto itCliente = std::find_if(clientes.begin(), clientes.end(), [idCliente](const Pessoa& cliente) {
-        return cliente.id == idCliente;
-    });
-
-    if (itCliente != clientes.end()) {
-        pagamentos.emplace_back(std::make_unique<PagamentoDinheiro>());
-        pagamentos.back()->realizarPagamento(valor, true);
-        std::cout << "Pagamento no valor de R$" << valor << " registrado com sucesso para o cliente: " << itCliente->nome << "\n";
-        registrarAtividade("Pagamento registrado: Cliente " + itCliente->nome + ", Valor: R$" + std::to_string(valor));
-    } else {
-        std::cout << "Cliente não encontrado.\n";
+    static void devolverFilme(Pessoa& cliente, Filme& filme, Historico& historico) {
+        filme.disponivel = true;
+        historico.adicionarRegistro(cliente.nome + " devolveu o filme: " + filme.titulo);
+        std::cout << "Filme devolvido com sucesso!\n";
     }
-}
+};
 
-void Sistema::registrarAtividades(const std::string& atividade) {
-    historico.adicionarAtividade(atividade);
-}
+// Classe Sistema de Locadora
+class SistemaLocadora {
+private:
+    std::vector<Pessoa> clientes;
+    std::vector<Filme> filmes;
+    Historico historico;
 
-void Sistema::exibirHistoricoDeAtividade() const {
-    historico.listarAtividade();
-}
+public:
+    void adicionarCliente(std::string nome) {
+        clientes.push_back(Pessoa(nome));
+    }
+    
+    void adicionarFilme(std::string titulo, int ano) {
+        filmes.push_back(Filme(titulo, ano));
+    }
+    
+    void listarFilmes() {
+        for (const auto& filme : filmes) {
+            std::cout << filme.titulo << " (" << filme.ano << ") - "
+                      << (filme.disponivel ? "Disponível" : "Indisponível") << std::endl;
+        }
+    }
+    
+    void alugarFilme(std::string nomeCliente, std::string tituloFilme) {
+        for (auto& cliente : clientes) {
+            if (cliente.nome == nomeCliente) {
+                for (auto& filme : filmes) {
+                    if (filme.titulo == tituloFilme) {
+                        Locacao::alugarFilme(cliente, filme, historico);
+                        return;
+                    }
+                }
+            }
+        }
+        std::cout << "Cliente ou filme não encontrado!\n";
+    }
+    
+    void devolverFilme(std::string nomeCliente, std::string tituloFilme) {
+        for (auto& cliente : clientes) {
+            if (cliente.nome == nomeCliente) {
+                for (auto& filme : filmes) {
+                    if (filme.titulo == tituloFilme) {
+                        Locacao::devolverFilme(cliente, filme, historico);
+                        return;
+                    }
+                }
+            }
+        }
+        std::cout << "Cliente ou filme não encontrado!\n";
+    }
+    
+    void mostrarHistorico() {
+        historico.mostrarHistorico();
+    }
+};
 
-void Sistema::salvarHistorico(const std::string& nomeArquivo) const {
-    historico.salvarHistoricoEmArquivo(nomeArquivo);
-}
-
-void Sistema::carregarHistorico(const std::string& nomeArquivo) {
-    historico.carregarHistoricoDeArquivo(nomeArquivo);
+int main() {
+    SistemaLocadora sistema;
+    sistema.adicionarCliente("João");
+    sistema.adicionarFilme("Matrix", 1999);
+    sistema.adicionarFilme("Vingadores", 2012);
+    
+    sistema.listarFilmes();
+    
+    sistema.alugarFilme("João", "Matrix");
+    sistema.listarFilmes();
+    
+    sistema.devolverFilme("João", "Matrix");
+    sistema.listarFilmes();
+    
+    sistema.mostrarHistorico();
+    
+    return 0;
 }
