@@ -1,129 +1,109 @@
+#include "Cliente.hpp"
+#include "Filmes.hpp"
+#include "Locacoes.hpp"
+#include "Pagamento.hpp"
+#include "Historico.hpp"
+#include "Promocao.hpp"
+#include "Utilitarios.hpp"
+
 #include <iostream>
 #include <vector>
-#include <string>
-#include <Sistema.hpp>
+#include <memory>
 
-// Classe Pessoa
-class Pessoa {
-public:
-    std::string nome;
-    Pessoa(std::string nome) : nome(nome) {}
-};
-
-// Classe Filme
-class Filme {
-public:
-    std::string titulo;
-    int ano;
-    bool disponivel;
-    Filme(std::string titulo, int ano) : titulo(titulo), ano(ano), disponivel(true) {}
-};
-
-// Classe Historico
-class Historico {
-public:
-    std::vector<std::string> registros;
-    void adicionarRegistro(std::string registro) {
-        registros.push_back(registro);
-    }
-    void mostrarHistorico() {
-        for (const auto& registro : registros) {
-            std::cout << registro << std::endl;
-        }
-    }
-};
-
-// Classe Locacao
-class Locacao {
-public:
-    static void alugarFilme(Pessoa& cliente, Filme& filme, Historico& historico) {
-        if (filme.disponivel) {
-            filme.disponivel = false;
-            historico.adicionarRegistro(cliente.nome + " alugou o filme: " + filme.titulo);
-            std::cout << "Filme alugado com sucesso!\n";
-        } else {
-            std::cout << "Filme indisponível!\n";
-        }
-    }
-
-    static void devolverFilme(Pessoa& cliente, Filme& filme, Historico& historico) {
-        filme.disponivel = true;
-        historico.adicionarRegistro(cliente.nome + " devolveu o filme: " + filme.titulo);
-        std::cout << "Filme devolvido com sucesso!\n";
-    }
-};
-
-// Classe Sistema de Locadora
 class SistemaLocadora {
 private:
     std::vector<Pessoa> clientes;
     std::vector<Filme> filmes;
     Historico historico;
+    Promocao promocao;
 
 public:
-    void adicionarCliente(std::string nome) {
-        clientes.push_back(Pessoa(nome));
+    // Adiciona um cliente à locadora
+    void cadastrarCliente(const Pessoa& cliente) {
+        clientes.push_back(cliente);
     }
-    
-    void adicionarFilme(std::string titulo, int ano) {
-        filmes.push_back(Filme(titulo, ano));
+
+    // Adiciona um filme à locadora
+    void cadastrarFilme(const Filme& filme) {
+        filmes.push_back(filme);
     }
-    
-    void listarFilmes() {
-        for (const auto& filme : filmes) {
-            std::cout << filme.titulo << " (" << filme.ano << ") - "
-                      << (filme.disponivel ? "Disponível" : "Indisponível") << std::endl;
+
+    // Realiza a locação de um filme
+    void realizarLocacao(const Pessoa& cliente, const Filme& filme, const std::string& dataLocacao, const std::string& dataDevolucao) {
+        Locacao locacao(cliente, filme, dataLocacao, dataDevolucao);
+        historico.adicionarRegistro("Locação realizada: " + filme.getTitulo() + " por " + cliente.getNome());
+
+        std::cout << "Locação realizada com sucesso para " << cliente.getNome() << "!\n";
+    }
+
+    // Realiza o pagamento de uma locação
+    void realizarPagamento(const Locacao& locacao, const std::shared_ptr<Pagamento>& metodoPagamento) {
+        bool pagamentoRealizado = false;
+        metodoPagamento->realizarPagamento(locacao, pagamentoRealizado);
+
+        if (pagamentoRealizado) {
+            historico.adicionarRegistro("Pagamento realizado com sucesso para locação de " + locacao.getFilme().getTitulo());
+            std::cout << "Pagamento realizado com sucesso!\n";
+        } else {
+            std::cout << "Erro no pagamento!\n";
         }
     }
-    
-    void alugarFilme(std::string nomeCliente, std::string tituloFilme) {
-        for (auto& cliente : clientes) {
-            if (cliente.nome == nomeCliente) {
-                for (auto& filme : filmes) {
-                    if (filme.titulo == tituloFilme) {
-                        Locacao::alugarFilme(cliente, filme, historico);
-                        return;
-                    }
-                }
-            }
-        }
-        std::cout << "Cliente ou filme não encontrado!\n";
+
+    // Aplica desconto baseado no ID do cliente
+    void aplicarDesconto(const Pessoa& cliente, Locacao& locacao) {
+        double precoOriginal = locacao.getPreco();
+        double precoComDesconto = promocao.aplicarDesconto(cliente, precoOriginal);
+        std::cout << "Desconto aplicado! Novo preço: R$ " << precoComDesconto << "\n";
     }
-    
-    void devolverFilme(std::string nomeCliente, std::string tituloFilme) {
-        for (auto& cliente : clientes) {
-            if (cliente.nome == nomeCliente) {
-                for (auto& filme : filmes) {
-                    if (filme.titulo == tituloFilme) {
-                        Locacao::devolverFilme(cliente, filme, historico);
-                        return;
-                    }
-                }
-            }
-        }
-        std::cout << "Cliente ou filme não encontrado!\n";
+
+    // Exibe o histórico de locações e pagamentos
+    void exibirHistorico() const {
+        historico.exibirHistorico();
     }
-    
-    void mostrarHistorico() {
-        historico.mostrarHistorico();
+
+    // Método de utilitário para calcular multa por atraso
+    void calcularMulta(const Locacao& locacao, int diasPermitidos) {
+        Multa multa;
+        double multaCalculada = multa.calcularMulta(locacao, diasPermitidos);
+        if (multaCalculada > 0) {
+            std::cout << "Multa por atraso: R$ " << multaCalculada << "\n";
+        } else {
+            std::cout << "Sem multa por atraso.\n";
+        }
     }
 };
 
+#include "Locacoes.hpp"
+#include "Pagamento.hpp"
+
 int main() {
-    SistemaLocadora sistema;
-    sistema.adicionarCliente("João");
-    sistema.adicionarFilme("Matrix", 1999);
-    sistema.adicionarFilme("Vingadores", 2012);
-    
-    sistema.listarFilmes();
-    
-    sistema.alugarFilme("João", "Matrix");
-    sistema.listarFilmes();
-    
-    sistema.devolverFilme("João", "Matrix");
-    sistema.listarFilmes();
-    
-    sistema.mostrarHistorico();
-    
+    // Criação de objetos
+    Locadora locadora;
+
+    // Criar cliente
+    Pessoa cliente("João Silva", 12345, "(11)99999-9999", "joao@example.com");
+    locadora.cadastrarCliente(cliente);
+
+    // Criar filme
+    Filme filme("O Poderoso Chefão", {"Drama", "Crime"}, 20.0, 1972, 180);
+    locadora.cadastrarFilme(filme);
+
+    // Realizar locação
+    locadora.realizarLocacao(cliente, filme, "2025-01-31", "2025-02-07");
+
+    // Realizar pagamento (exemplo com pagamento em dinheiro)
+    Locacao locacao(cliente, filme, "2025-01-31", "2025-02-07");
+    std::shared_ptr<Pagamento> pagamento = std::make_shared<PagamentoDinheiro>();
+    locadora.realizarPagamento(locacao, pagamento);
+
+    // Aplicar desconto
+    locadora.aplicarDesconto(cliente, locacao);
+
+    // Calcular multa
+    locadora.calcularMulta(locacao, 7);  // 7 dias permitidos
+
+    // Exibir histórico
+    locadora.exibirHistorico();
+
     return 0;
 }
