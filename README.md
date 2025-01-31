@@ -13,7 +13,6 @@ Desenvolver um sistema completo para gerenciar todas as operações de uma locad
 - Cadastro e gerenciamento de clientes.  
 - Registro e gerenciamento de locações.  
 - Controle de pagamentos, incluindo multas por atraso.
-- Utilitários (contém ferramentas auxiliares, como validações de dados, e suporte para cálculos específicos).
 - Gestão de promoções e programas de fidelidade.
 - Histórico detalhado de atividades para relatórios e análises.
 
@@ -25,13 +24,13 @@ Gerencia os dados dos clientes, como nome, endereço, telefone, e histórico de 
 - **Locação**  
 Responsável pelo registro das transações de locação, incluindo datas de retirada e devolução, e status de pagamento.  
 - **Pagamento**  
-Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.  
-- **Sistema**  
-Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.
+Gerencia os pagamentos realizados pelos clientes, incluindo cálculos de valores, registro de multas e controle de pendências.    
 - **Promoção**  
 Gerencia promoções e benefícios oferecidos pelo sistema.
 - **Histórico**  
-Gerencia e organiza o histórico de atividades do sistema.
+Gerencia e organiza o histórico de atividades do sistema.  
+- **Sistema**  
+Centraliza as funcionalidades do sistema, integrando as demais classes e garantindo a operação eficiente do sistema.  
   
 
 O projeto foi planejado para ser modular e escalável, permitindo futuras expansões e adaptações conforme as necessidades da locadora evoluam.  
