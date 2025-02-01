@@ -6,7 +6,7 @@ Pessoa::Pessoa() : nome(""), cpf(""), permitidoLocacao(false), id(0) {}
 // Coletar dados do usuário
 void Pessoa::coletarDados() {
     std::cout << "Digite o nome da pessoa: ";
-    std::getline(std::cin, nome);
+    std::getline(std::cin >> std::ws, nome);  // Adiciona std::ws para limpar espaços em branco
 
     std::cout << "Digite o CPF da pessoa (somente números): ";
     std::getline(std::cin, cpf);
@@ -41,7 +41,7 @@ void Pessoa::cadastrarNoArquivo() {
 }
 
 // Listar conteúdo do arquivo
-void Pessoa::exibirDados() const {  // Adicionar const aqui
+void Pessoa::exibirDados() const {
     std::ifstream arquivo("dados.txt");
     if (arquivo.is_open()) {
         std::string linha;

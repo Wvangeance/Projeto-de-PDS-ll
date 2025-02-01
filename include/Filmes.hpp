@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 class Filme {
 private:
@@ -12,6 +13,8 @@ private:
     int classificacaoEtaria;
     int anoLancamento;
     double preco;
+    int id;
+    static int nextId;
 
 public:
     Filme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento, double preco);
@@ -21,9 +24,12 @@ public:
     int getClassificacaoEtaria() const;
     int getAnoLancamento() const;
     double getPreco() const;
+    int getId() const;
     void setPreco(double preco);
 
     void exibirInformacoes() const;
+    void registrarNoArquivo() const;
+    static void listarFilmesArquivo();
 };
 
 #endif // FILMES_HPP

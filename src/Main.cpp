@@ -117,7 +117,9 @@ void cadastrarFilme(std::vector<Filme>& filmes) {
     std::cin >> preco;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    filmes.emplace_back(titulo, generos, classificacaoEtaria, anoLancamento, preco);
+    Filme filme(titulo, generos, classificacaoEtaria, anoLancamento, preco);
+    filme.registrarNoArquivo();
+    filmes.push_back(filme);
     std::cout << "Filme cadastrado com sucesso!\n";
 }
 
@@ -125,13 +127,15 @@ void cadastrarFilme(std::vector<Filme>& filmes) {
 void listarFilmes(const std::vector<Filme>& filmes) {
     if (filmes.empty()) {
         std::cout << "Nenhum filme cadastrado.\n";
-        return;
+    } else {
+        std::cout << "\n=== Lista de Filmes ===\n";
+        for (const auto& filme : filmes) {
+            filme.exibirInformacoes();
+        }
     }
 
-    std::cout << "\n=== Lista de Filmes ===\n";
-    for (const auto& filme : filmes) {
-        filme.exibirInformacoes();
-    }
+    // Também exibe os filmes do arquivo
+    Filme::listarFilmesArquivo();
 }
 
 // Função para realizar uma locação
