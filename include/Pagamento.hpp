@@ -4,7 +4,6 @@
 #include <iostream>
 #include <memory>
 #include <limits>
-#include <string>
 #include "Locacoes.hpp"
 
 // Classe base abstrata Pagamento
@@ -47,10 +46,7 @@ public:
 // Classe para cálculo de multas por atraso
 class Multa {
 public:
-    // Calcula a multa com base no atraso e no número de dias permitidos
     static double calcularMulta(const Locacao& locacao, int diasPermitidos);
-
-    // Função auxiliar para obter a data atual no formato "YYYY-MM-DD"
     static std::string getDataAtual();
 };
 

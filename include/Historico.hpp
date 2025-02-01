@@ -3,8 +3,6 @@
 
 #include <vector>
 #include <string>
-#include "Locacoes.hpp"
-#include "Pagamento.hpp"
 
 class Historico {
 private:

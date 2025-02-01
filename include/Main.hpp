@@ -9,7 +9,5 @@
 #include "Historico.hpp"
 
 void menuPrincipal();
-void realizarLocacao(Historico& historico);
-void processarPagamento(const Locacao& locacao, Historico& historico);
 
 #endif // MAIN_HPP

@@ -4,7 +4,7 @@
 #include <iomanip>
 
 // Função auxiliar para obter a data atual no formato "YYYY-MM-DD"
-std::string getDataAtual() {
+std::string Multa::getDataAtual() {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
     std::ostringstream oss;
@@ -88,5 +88,3 @@ double Multa::calcularMulta(const Locacao& locacao, int diasPermitidos) {
     double multaTotal = multaFixa + juros;
     return (multaTotal > valorEmprestimo) ? valorEmprestimo : multaTotal; // Limite da multa
 }
-
-
