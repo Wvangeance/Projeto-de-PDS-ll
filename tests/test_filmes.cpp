@@ -1,54 +1,79 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "Filmes.hpp"
+#include <fstream>
+#include <sstream>
 
+using ::testing::AtLeast; // Para checar chamadas mínimas
 using ::testing::Return;
-using ::testing::_;
 
-// Teste de criação de Filme
-TEST(FilmeTest, CriacaoFilme) {
-    Filme filme("Matrix", {"Ação", "Ficção Científica"}, 14, 1999, 19.90);
-    EXPECT_EQ(filme.getTitulo(), "Matrix");
-    EXPECT_EQ(filme.getClassificacaoEtaria(), 14);
-    EXPECT_EQ(filme.getAnoLancamento(), 1999);
-    EXPECT_EQ(filme.getPreco(), 19.90);
-    EXPECT_EQ(filme.getGeneros().size(), 2);
-}
-
-// Teste de lançamento recente
-TEST(FilmeTest, FilmeRecemLancado) {
-    Filme filmeNovo("Avatar 3", {"Aventura", "Ficção"}, 12, 2024, 29.90);
-    EXPECT_TRUE(filmeNovo.isRecemLancado());
-    
-    Filme filmeAntigo("Titanic", {"Romance", "Drama"}, 12, 1997, 15.00);
-    EXPECT_FALSE(filmeAntigo.isRecemLancado());
-}
-
-// Teste de alteração de preço
-TEST(FilmeTest, AlterarPreco) {
-    Filme filme("Inception", {"Ação", "Ficção Científica"}, 12, 2010, 25.00);
-    filme.setPreco(30.00);
-    EXPECT_EQ(filme.getPreco(), 30.00);
-}
-
-// Mock para testar interações com arquivos
-class MockSistemaFilmes : public SistemaFilmes {
+// Mock para simular o comportamento da classe Filme
+class MockFilme : public Filme {
 public:
-    MOCK_METHOD(void, salvarFilmes, (), (const, override));
-    MOCK_METHOD(void, carregarFilmes, (), (override));
+    MockFilme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento, double preco)
+        : Filme(titulo, generos, classificacaoEtaria, anoLancamento, preco) {}
+
+    MOCK_METHOD(std::string, getTitulo, (), (const, override));
+    MOCK_METHOD(std::vector<std::string>, getGeneros, (), (const, override));
+    MOCK_METHOD(int, getClassificacaoEtaria, (), (const, override));
+    MOCK_METHOD(int, getAnoLancamento, (), (const, override));
+    MOCK_METHOD(double, getPreco, (), (const, override));
+    MOCK_METHOD(void, registrarNoArquivo, (), (const, override));
+    MOCK_METHOD(void, listarFilmesArquivo, (), (override));
 };
 
-// Teste de cadastro de filme
-TEST(SistemaFilmesTest, CadastroFilme) {
-    MockSistemaFilmes mockSistema;
-    EXPECT_CALL(mockSistema, salvarFilmes()).Times(1);
-    
-    mockSistema.cadastrarFilme();
+// Teste para verificar o registro do filme no arquivo
+test(FilmeTest, RegistroNoArquivo) {
+    Filme filme("Matrix", {"Ação", "Ficção Científica"}, 16, 1999, 12.50);
+
+    // Cria um arquivo temporário para teste
+    std::ofstream tempFile("temp_filmes.txt", std::ios::trunc);
+    tempFile.close();
+
+    // Substitui o arquivo original temporariamente
+    std::rename("filmes.txt", "backup_filmes.txt");
+    std::rename("temp_filmes.txt", "filmes.txt");
+
+    filme.registrarNoArquivo();
+
+    // Verifica se os dados foram escritos corretamente
+    std::ifstream arquivo("filmes.txt");
+    std::stringstream buffer;
+    buffer << arquivo.rdbuf();
+
+    std::string esperado = "ID: 0\nTítulo: Matrix\nGêneros: Ação Ficção Científica \nClassificação Etária: 16+\nAno de Lançamento: 1999\nPreço: R$ 12.5\n-----------------------------\n";
+    EXPECT_EQ(buffer.str(), esperado);
+
+    // Restaura o arquivo original
+    std::remove("filmes.txt");
+    std::rename("backup_filmes.txt", "filmes.txt");
 }
 
-// Teste de listagem de filmes (simulando que há filmes cadastrados)
-TEST(SistemaFilmesTest, ListarFilmes) {
-    SistemaFilmes sistema;
-    sistema.cadastrarFilme();
-    EXPECT_NO_THROW(sistema.listarFilmes());
+// Teste para verificar a listagem dos filmes
+test(FilmeTest, ListarFilmes) {
+    // Cria um arquivo com dados de teste
+    std::ofstream arquivo("filmes.txt");
+    arquivo << "ID: 1\nTítulo: Inception\nGêneros: Ação Ficção Científica \nClassificação Etária: 14+\nAno de Lançamento: 2010\nPreço: R$ 15\n-----------------------------\n";
+    arquivo.close();
+
+    Filme filme("Dummy", {}, 0, 0, 0.0);
+
+    // Redireciona a saída padrão para capturar a saída da função
+    std::stringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
+    filme.listarFilmesArquivo();
+
+    std::cout.rdbuf(oldCout); // Restaura std::cout
+
+    std::string esperado = "\nFilmes cadastrados:\nID: 1\nTítulo: Inception\nGêneros: Ação Ficção Científica \nClassificação Etária: 14+\nAno de Lançamento: 2010\nPreço: R$ 15\n-----------------------------\n\n";
+    EXPECT_EQ(buffer.str(), esperado);
+
+    // Limpa o arquivo de teste
+    std::remove("filmes.txt");
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

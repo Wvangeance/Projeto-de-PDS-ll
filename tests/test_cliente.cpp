@@ -1,66 +1,75 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "Cliente.hpp"
+#include <sstream>
 
-// Classe mock para testar interações
+using ::testing::AtLeast; // Para checar chamadas mínimas
+using ::testing::Return;
+
+// Mock para simular o comportamento de arquivos
 class MockPessoa : public Pessoa {
 public:
     MOCK_METHOD(void, coletarDados, (), (override));
     MOCK_METHOD(void, cadastrarNoArquivo, (), (override));
-    MOCK_METHOD(void, listarArquivo, (), (override));
-    MOCK_METHOD(void, editarPermissaoLocacao, (), (override));
+    MOCK_METHOD(void, exibirDados, (), (const, override));
+    MOCK_METHOD(std::string, getNome, (), (const, override));
+    MOCK_METHOD(int, getId, (), (const, override));
 };
 
-// Teste de inicialização da classe Pessoa
-TEST(PessoaTest, ConstrutorPadrao) {
+// Teste para verificar o cadastro no arquivo
+test(PessoaTest, CadastroNoArquivo) {
     Pessoa pessoa;
-    EXPECT_EQ(pessoa.getNome(), "");
-    EXPECT_EQ(pessoa.getId(), 0);
-}
+    pessoa.nome = "Joao Teste";
+    pessoa.cpf = "12345678900";
+    pessoa.permitidoLocacao = true;
+    pessoa.id = 1;
 
-// Teste de coleta de dados simulada
-TEST(PessoaTest, ColetarDados) {
-    MockPessoa mockPessoa;
-    EXPECT_CALL(mockPessoa, coletarDados()).Times(1);
-    mockPessoa.coletarDados();
-}
+    // Redireciona o fluxo para um arquivo temporário
+    std::ofstream tempFile("temp_dados.txt", std::ios::trunc);
+    tempFile.close(); // Fecha para permitir a escrita pela função
 
-// Teste de escrita no arquivo
-TEST(PessoaTest, CadastrarNoArquivo) {
-    Pessoa pessoa;
-    std::ofstream arquivo("dados.txt", std::ios::trunc);
-    ASSERT_TRUE(arquivo.is_open());
-    arquivo.close();
+    // Substitui o nome do arquivo temporariamente
+    std::ofstream originalFile("dados.txt");
+    std::rename("dados.txt", "backup_dados.txt");
+    std::rename("temp_dados.txt", "dados.txt");
 
     pessoa.cadastrarNoArquivo();
 
-    std::ifstream arquivoIn("dados.txt");
-    ASSERT_TRUE(arquivoIn.is_open());
+    // Verifica se os dados foram escritos corretamente
+    std::ifstream arquivo("dados.txt");
     std::stringstream buffer;
-    buffer << arquivoIn.rdbuf();
-    arquivoIn.close();
-    EXPECT_FALSE(buffer.str().empty());
+    buffer << arquivo.rdbuf();
+
+    std::string esperado = "Nome: Joao Teste\nCPF: 12345678900\nPermitido Locação: Sim\nID: 1\n-----------------------------\n";
+    EXPECT_EQ(buffer.str(), esperado);
+
+    // Restaura o arquivo original
+    std::remove("dados.txt");
+    std::rename("backup_dados.txt", "dados.txt");
 }
 
-// Teste de leitura do arquivo
-TEST(PessoaTest, ListarArquivo) {
-    Pessoa pessoa;
+// Teste para verificar exibição dos dados
+test(PessoaTest, ExibirDados) {
+    // Cria um arquivo com dados de teste
     std::ofstream arquivo("dados.txt");
-    arquivo << "Nome: Teste\nCPF: 12345678900\nPermitido Locacao: Sim\nID: 1\n";
+    arquivo << "Nome: Maria Teste\nCPF: 98765432100\nPermitido Locação: Não\nID: 2\n-----------------------------\n";
     arquivo.close();
 
-    std::ifstream arquivoIn("dados.txt");
-    ASSERT_TRUE(arquivoIn.is_open());
-    arquivoIn.close();
-    
-    pessoa.listarArquivo();
-}
+    Pessoa pessoa;
 
-// Teste de edição de permissão de locação simulada
-TEST(PessoaTest, EditarPermissaoLocacao) {
-    MockPessoa mockPessoa;
-    EXPECT_CALL(mockPessoa, editarPermissaoLocacao()).Times(1);
-    mockPessoa.editarPermissaoLocacao();
+    // Redireciona a saída padrão para capturar a saída da função
+    std::stringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
+    pessoa.exibirDados();
+
+    std::cout.rdbuf(oldCout); // Restaura std::cout
+
+    std::string esperado = "\nClientes cadastrados:\nNome: Maria Teste\nCPF: 98765432100\nPermitido Locação: Não\nID: 2\n-----------------------------\n\n";
+    EXPECT_EQ(buffer.str(), esperado);
+
+    // Limpa o arquivo de teste
+    std::remove("dados.txt");
 }
 
 int main(int argc, char **argv) {

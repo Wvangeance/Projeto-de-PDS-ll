@@ -1,64 +1,81 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "Locacoes.hpp"
+#include <sstream>
 
-// Mock para a classe Filme
-class MockFilme : public Filme {
-public:
-    MockFilme() : Filme("Mock Filme", {"Aventura"}, 12, 2023, 10.0) {}
-    MOCK_METHOD(double, getPreco, (), (const, override));
-};
+using ::testing::Return;
+using ::testing::AtLeast;
 
 // Mock para a classe Pessoa
 class MockPessoa : public Pessoa {
 public:
-    MockPessoa() : Pessoa("Mock Cliente", 25) {}
     MOCK_METHOD(std::string, getNome, (), (const, override));
 };
 
-TEST(LocacaoTest, CriacaoLocacao) {
-    MockPessoa cliente;
-    MockFilme filme;
-    
-    EXPECT_CALL(cliente, getNome()).WillOnce(testing::Return("Mock Cliente"));
-    EXPECT_CALL(filme, getPreco()).WillOnce(testing::Return(10.0));
-    
-    Locacao locacao(cliente, filme, "2024-01-01", "2024-01-07");
-    
-    EXPECT_EQ(locacao.getCliente().getNome(), "Mock Cliente");
-    EXPECT_EQ(locacao.getFilme().getTitulo(), "Mock Filme");
-    EXPECT_EQ(locacao.getDataLocacao(), "2024-01-01");
-    EXPECT_EQ(locacao.getDataDevolucao(), "2024-01-07");
-    EXPECT_EQ(locacao.getPreco(), 10.0);
+// Mock para a classe Filme
+class MockFilme : public Filme {
+public:
+    MockFilme() : Filme("MockTitle", {"Ação"}, 12, 2020, 15.0) {}
+    MOCK_METHOD(std::string, getTitulo, (), (const, override));
+    MOCK_METHOD(double, getPreco, (), (const, override));
+};
+
+// Teste para calcular dias de atraso
+TEST(LocacaoTest, CalcularDiasAtrasoSemAtraso) {
+    Pessoa cliente;
+    Filme filme("Matrix", {"Ação", "Ficção"}, 16, 1999, 10.0);
+    Locacao locacao(cliente, filme, "2023-01-01", "2023-01-10");
+
+    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-09"), 0);  // Antes da devolução
+    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-10"), 0);  // No dia da devolução
 }
 
-TEST(LocacaoTest, CalcularDiasAtraso) {
-    MockPessoa cliente;
-    MockFilme filme;
-    Locacao locacao(cliente, filme, "2024-01-01", "2024-01-07");
-    
-    EXPECT_EQ(locacao.calcularDiasAtraso("2024-01-08"), 1);
-    EXPECT_EQ(locacao.calcularDiasAtraso("2024-01-10"), 3);
-    EXPECT_EQ(locacao.calcularDiasAtraso("2024-01-07"), 0);
+TEST(LocacaoTest, CalcularDiasAtrasoComAtraso) {
+    Pessoa cliente;
+    Filme filme("Matrix", {"Ação", "Ficção"}, 16, 1999, 10.0);
+    Locacao locacao(cliente, filme, "2023-01-01", "2023-01-10");
+
+    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-12"), 2);  // 2 dias de atraso
 }
 
-TEST(LocacaoTest, ExibirInformacoes) {
-    MockPessoa cliente;
-    MockFilme filme;
-    
-    EXPECT_CALL(cliente, getNome()).WillRepeatedly(testing::Return("Mock Cliente"));
-    EXPECT_CALL(filme, getTitulo()).WillRepeatedly(testing::Return("Mock Filme"));
-    EXPECT_CALL(filme, getPreco()).WillRepeatedly(testing::Return(10.0));
-    
-    Locacao locacao(cliente, filme, "2024-01-01", "2024-01-07");
-    
-    testing::internal::CaptureStdout();
+// Teste para verificar exibição de informações usando mocks
+TEST(LocacaoTest, ExibirInformacoesComMock) {
+    MockPessoa mockCliente;
+    MockFilme mockFilme;
+
+    EXPECT_CALL(mockCliente, getNome())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return("João Mock"));
+
+    EXPECT_CALL(mockFilme, getTitulo())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return("Mock Movie"));
+
+    EXPECT_CALL(mockFilme, getPreco())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(25.0));
+
+    Locacao locacao(mockCliente, mockFilme, "2023-01-01", "2023-01-10");
+
+    std::ostringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
     locacao.exibirInformacoes();
-    std::string output = testing::internal::GetCapturedStdout();
-    
-    EXPECT_THAT(output, testing::HasSubstr("Mock Cliente"));
-    EXPECT_THAT(output, testing::HasSubstr("Mock Filme"));
-    EXPECT_THAT(output, testing::HasSubstr("2024-01-01"));
-    EXPECT_THAT(output, testing::HasSubstr("2024-01-07"));
-    EXPECT_THAT(output, testing::HasSubstr("R$ 10.0"));
+
+    std::cout.rdbuf(oldCout); // Restaurar std::cout
+
+    std::string esperado = 
+        "Cliente: João Mock\n"
+        "Filme: Mock Movie\n"
+        "Data de Locação: 2023-01-01\n"
+        "Data de Devolução: 2023-01-10\n"
+        "Preço da Locação: R$ 25\n";
+
+    EXPECT_EQ(buffer.str(), esperado);
+}
+
+// Função principal para rodar os testes
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

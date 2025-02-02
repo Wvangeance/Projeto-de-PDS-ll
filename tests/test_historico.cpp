@@ -3,86 +3,68 @@
 #include "Historico.hpp"
 #include <sstream>
 
-// Mock para std::ostream
-class MockOstream : public std::ostream {
+using ::testing::Return;
+using ::testing::AtLeast;
+
+// Mock da classe Historico
+class MockHistorico : public Historico {
 public:
-    MOCK_METHOD(void, write, (const char* s, std::streamsize n), (override));
+    MOCK_METHOD(void, adicionarRegistro, (const std::string& registro), (override));
+    MOCK_METHOD(void, exibirHistorico, (), (const, override));
 };
 
-// Teste para adicionar registros ao histórico com mock
-TEST(HistoricoTest, TesteAdicionarRegistroComMock) {
+// Teste para verificar a adição de um registro
+TEST(HistoricoTest, AdicionarRegistroTest) {
+    Historico historico;
+    historico.adicionarRegistro("Cliente João alugou Matrix");
+    
+    std::ostringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+    
+    historico.exibirHistorico();
+
+    std::cout.rdbuf(oldCout); // Restaurar std::cout
+
+    std::string esperado = "===== Histórico de Locações e Pagamentos =====\nCliente João alugou Matrix\n";
+    EXPECT_EQ(buffer.str(), esperado);
+}
+
+// Teste para verificar exibição de histórico vazio
+TEST(HistoricoTest, ExibirHistoricoVazioTest) {
     Historico historico;
     
-    // Adicionando registros
-    historico.adicionarRegistro("Locação de filme: Aventura");
-    historico.adicionarRegistro("Pagamento realizado: $10");
+    std::ostringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
 
-    // Mock do ostream
-    MockOstream mockOstream;
+    historico.exibirHistorico();
+
+    std::cout.rdbuf(oldCout); // Restaurar std::cout
+
+    std::string esperado = "===== Histórico de Locações e Pagamentos =====\nNenhum registro encontrado.\n";
+    EXPECT_EQ(buffer.str(), esperado);
+}
+
+// Teste usando Mock para garantir que os métodos são chamados
+TEST(HistoricoTest, MockAdicionarRegistro) {
+    MockHistorico mockHistorico;
     
-    // Expectation para verificar se a função write é chamada corretamente
-    EXPECT_CALL(mockOstream, write(testing::Contains("Locação de filme: Aventura"), testing::_));
-    EXPECT_CALL(mockOstream, write(testing::Contains("Pagamento realizado: $10"), testing::_));
+    EXPECT_CALL(mockHistorico, adicionarRegistro("Teste de Mock"))
+        .Times(AtLeast(1));
 
-    // Redireciona o cout para o mock
-    std::streambuf* cout_backup = std::cout.rdbuf();
-    std::cout.rdbuf(&mockOstream); 
-
-    historico.exibirHistorico();
-
-    // Restaura o fluxo de saída padrão
-    std::cout.rdbuf(cout_backup);
+    mockHistorico.adicionarRegistro("Teste de Mock");
 }
 
-// Teste para exibir histórico vazio com mock
-TEST(HistoricoTest, TesteExibirHistoricoVazioComMock) {
-    Historico historico;
+TEST(HistoricoTest, MockExibirHistorico) {
+    MockHistorico mockHistorico;
 
-    // Mock do ostream
-    MockOstream mockOstream;
+    EXPECT_CALL(mockHistorico, exibirHistorico())
+        .Times(AtLeast(1));
 
-    // Expectation para verificar se a função write é chamada com a mensagem de "Nenhum registro encontrado"
-    EXPECT_CALL(mockOstream, write(testing::Contains("Nenhum registro encontrado."), testing::_));
-
-    // Redireciona o cout para o mock
-    std::streambuf* cout_backup = std::cout.rdbuf();
-    std::cout.rdbuf(&mockOstream);
-
-    historico.exibirHistorico();
-
-    // Restaura o fluxo de saída padrão
-    std::cout.rdbuf(cout_backup);
+    mockHistorico.exibirHistorico();
 }
 
-// Teste para adicionar e exibir múltiplos registros com mock
-TEST(HistoricoTest, TesteAdicionarVariosRegistrosComMock) {
-    Historico historico;
-
-    // Adicionando múltiplos registros
-    historico.adicionarRegistro("Locação de filme: Drama");
-    historico.adicionarRegistro("Pagamento realizado: $15");
-    historico.adicionarRegistro("Locação de filme: Comédia");
-
-    // Mock do ostream
-    MockOstream mockOstream;
-
-    // Expectations para verificar se a função write é chamada corretamente
-    EXPECT_CALL(mockOstream, write(testing::Contains("Locação de filme: Drama"), testing::_));
-    EXPECT_CALL(mockOstream, write(testing::Contains("Pagamento realizado: $15"), testing::_));
-    EXPECT_CALL(mockOstream, write(testing::Contains("Locação de filme: Comédia"), testing::_));
-
-    // Redireciona o cout para o mock
-    std::streambuf* cout_backup = std::cout.rdbuf();
-    std::cout.rdbuf(&mockOstream);
-
-    historico.exibirHistorico();
-
-    // Restaura o fluxo de saída padrão
-    std::cout.rdbuf(cout_backup);
-}
-
+// Função principal para rodar os testes
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
-    ::testing::InitGoogleMock(&argc, argv);  // Inicializa o Google Mock
     return RUN_ALL_TESTS();
 }
