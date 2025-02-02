@@ -22,7 +22,6 @@ void PagamentoDinheiro::realizarPagamento(const Locacao& locacao, bool& pagament
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-
     if (valorPago > valor) {
         std::cout << "Pagamento realizado com sucesso. Troco: R$ " << valorPago - valor << ".\n";
         pagamentoRealizado = true;
@@ -64,7 +63,6 @@ void PagamentoEscambo::realizarPagamento(const Locacao& locacao, bool& pagamento
     std::cout << "O objeto para troca foi avaliado pelo balconista. Objeto aceito? (S/N): ";
     std::cin >> avaliacao;
     avaliacao = toupper(avaliacao);
-
     if (avaliacao == 'S') {
         std::cout << "Pagamento realizado por escambo.\n";
         pagamentoRealizado = true;
@@ -79,7 +77,6 @@ double Multa::calcularMulta(const Locacao& locacao, int diasPermitidos) {
     std::string dataAtual = getDataAtual(); // Obtém a data atual
     int diasAtraso = locacao.calcularDiasAtraso(dataAtual); // Passa a data atual como argumento
     double valorEmprestimo = locacao.getFilme().getPreco();
-
     if (diasAtraso <= diasPermitidos) {
         return 0.0; // Sem multa dentro do prazo
     }

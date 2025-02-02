@@ -51,4 +51,3 @@ public:
 };
 
 #endif // PAGAMENTO_HPP
-

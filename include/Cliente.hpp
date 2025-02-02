@@ -14,12 +14,10 @@ private:
     int id;
 
 public:
-    Pessoa(); // Construtor padrão
-
+    Pessoa();
     void coletarDados();
     void cadastrarNoArquivo();
-    void exibirDados() const;  // Adicionar const aqui
-
+    static void listarClientes();
     std::string getNome() const;
     int getId() const;
 };

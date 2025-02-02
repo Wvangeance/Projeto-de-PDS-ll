@@ -6,19 +6,14 @@ Pessoa::Pessoa() : nome(""), cpf(""), permitidoLocacao(false), id(0) {}
 // Coletar dados do usuário
 void Pessoa::coletarDados() {
     std::cout << "Digite o nome da pessoa: ";
-    std::getline(std::cin >> std::ws, nome);  // Adiciona std::ws para limpar espaços em branco
-
+    std::getline(std::cin >> std::ws, nome);
     std::cout << "Digite o CPF da pessoa (somente números): ";
     std::getline(std::cin, cpf);
-
     char resposta;
     std::cout << "Permitir locação? (S/N): ";
     std::cin >> resposta;
     permitidoLocacao = (resposta == 'S' || resposta == 's');
-
-    // Limpar buffer de entrada
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    
     std::cout << "Digite o ID da pessoa: ";
     std::cin >> id;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -26,7 +21,7 @@ void Pessoa::coletarDados() {
 
 // Cadastrar dados no arquivo
 void Pessoa::cadastrarNoArquivo() {
-    std::ofstream arquivo("dados.txt", std::ios::app);
+    std::ofstream arquivo("clientes.txt", std::ios::app);
     if (arquivo.is_open()) {
         arquivo << "Nome: " << nome << "\n";
         arquivo << "CPF: " << cpf << "\n";
@@ -40,9 +35,9 @@ void Pessoa::cadastrarNoArquivo() {
     }
 }
 
-// Listar conteúdo do arquivo
-void Pessoa::exibirDados() const {
-    std::ifstream arquivo("dados.txt");
+// Listar todos os clientes cadastrados
+void Pessoa::listarClientes() {
+    std::ifstream arquivo("clientes.txt");
     if (arquivo.is_open()) {
         std::string linha;
         std::cout << "\nClientes cadastrados:\n";
@@ -56,10 +51,5 @@ void Pessoa::exibirDados() const {
 }
 
 // Getters
-std::string Pessoa::getNome() const {
-    return nome;
-}
-
-int Pessoa::getId() const {
-    return id;
-}
+std::string Pessoa::getNome() const { return nome; }
+int Pessoa::getId() const { return id; }

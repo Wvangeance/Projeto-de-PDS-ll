@@ -11,7 +11,6 @@ private:
 public:
     // Adiciona um registro ao histórico
     void adicionarRegistro(const std::string& registro);
-
     // Exibe todo o histórico armazenado
     void exibirHistorico() const;
 };

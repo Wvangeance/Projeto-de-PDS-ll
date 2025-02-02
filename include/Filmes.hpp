@@ -18,7 +18,6 @@ private:
 
 public:
     Filme(const std::string& titulo, const std::vector<std::string>& generos, int classificacaoEtaria, int anoLancamento, double preco);
-
     std::string getTitulo() const;
     std::vector<std::string> getGeneros() const;
     int getClassificacaoEtaria() const;
@@ -26,10 +25,8 @@ public:
     double getPreco() const;
     int getId() const;
     void setPreco(double preco);
-
-    void exibirInformacoes() const;
     void registrarNoArquivo() const;
-    static void listarFilmesArquivo();
+    static void listarFilmes();
 };
 
 #endif // FILMES_HPP
