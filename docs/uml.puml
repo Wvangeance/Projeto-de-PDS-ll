@@ -1,4 +1,3 @@
-```plaintext
 @startuml
 
 class Pessoa {
@@ -97,4 +96,3 @@ Locacao "1" -- "1" Multa
 Pessoa "1" -- "1" Promocao
 
 @enduml
-```
