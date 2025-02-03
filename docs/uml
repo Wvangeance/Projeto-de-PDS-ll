@@ -1,0 +1,100 @@
+```plaintext
+@startuml
+
+class Pessoa {
+    - string nome
+    - string cpf
+    - bool permitidoLocacao
+    - int id
+    + Pessoa()
+    + void coletarDados()
+    + void cadastrarNoArquivo()
+    + static void listarClientes()
+    + string getNome() const
+    + int getId() const
+}
+
+class Filme {
+    - string titulo
+    - vector<string> generos
+    - int classificacaoEtaria
+    - int anoLancamento
+    - double preco
+    - int id
+    - static int nextId
+    + Filme(string, vector<string>, int, int, double)
+    + string getTitulo() const
+    + vector<string> getGeneros() const
+    + int getClassificacaoEtaria() const
+    + int getAnoLancamento() const
+    + double getPreco() const
+    + int getId() const
+    + void setPreco(double)
+    + void registrarNoArquivo() const
+    + static void listarFilmes()
+}
+
+class Historico {
+    - vector<string> registros
+    + void adicionarRegistro(string)
+    + void exibirHistorico() const
+}
+
+class Locacao {
+    - Pessoa cliente
+    - Filme filme
+    - string dataLocacao
+    - string dataDevolucao
+    + Locacao()
+    + Locacao(Pessoa, Filme, string, string)
+    + Pessoa getCliente() const
+    + Filme getFilme() const
+    + string getDataLocacao() const
+    + string getDataDevolucao() const
+    + double getPreco() const
+    + int calcularDiasAtraso(string) const
+    + void exibirInformacoes() const
+}
+
+class Pagamento {
+    + virtual void realizarPagamento(Locacao, bool&) = 0
+}
+
+class PagamentoDinheiro extends Pagamento {
+    + void realizarPagamento(Locacao, bool&) override
+}
+
+class PagamentoCartaoCredito extends Pagamento {
+    + void realizarPagamento(Locacao, bool&) override
+}
+
+class PagamentoCartaoDebito extends Pagamento {
+    + void realizarPagamento(Locacao, bool&) override
+}
+
+class PagamentoPix extends Pagamento {
+    + void realizarPagamento(Locacao, bool&) override
+}
+
+class PagamentoEscambo extends Pagamento {
+    + void realizarPagamento(Locacao, bool&) override
+}
+
+class Multa {
+    + static double calcularMulta(Locacao, int)
+    + static string getDataAtual()
+}
+
+class Promocao {
+    + static double aplicarDesconto(Pessoa, double)
+    + static double calcularDesconto(int)
+}
+
+Pessoa "1" -- "*" Locacao
+Filme "1" -- "*" Locacao
+Locacao "1" -- "1" Pagamento
+Locacao "1" -- "1" Multa
+Pessoa "1" -- "1" Promocao
+
+@enduml
+```
