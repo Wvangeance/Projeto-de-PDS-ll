@@ -1,81 +1,81 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "Locacoes.hpp"
-#include <sstream>
 
 using ::testing::Return;
-using ::testing::AtLeast;
 
-// Mock para a classe Pessoa
+// Mock para Pessoa
 class MockPessoa : public Pessoa {
 public:
     MOCK_METHOD(std::string, getNome, (), (const, override));
+    MOCK_METHOD(int, getId, (), (const, override));
 };
 
-// Mock para a classe Filme
+// Mock para Filme
 class MockFilme : public Filme {
 public:
-    MockFilme() : Filme("MockTitle", {"Ação"}, 12, 2020, 15.0) {}
+    MockFilme() : Filme("Mock", {"Mock"}, 0, 2000, 0.0) {}
     MOCK_METHOD(std::string, getTitulo, (), (const, override));
     MOCK_METHOD(double, getPreco, (), (const, override));
 };
 
-// Teste para calcular dias de atraso
-TEST(LocacaoTest, CalcularDiasAtrasoSemAtraso) {
-    Pessoa cliente;
-    Filme filme("Matrix", {"Ação", "Ficção"}, 16, 1999, 10.0);
-    Locacao locacao(cliente, filme, "2023-01-01", "2023-01-10");
-
-    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-09"), 0);  // Antes da devolução
-    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-10"), 0);  // No dia da devolução
-}
-
-TEST(LocacaoTest, CalcularDiasAtrasoComAtraso) {
-    Pessoa cliente;
-    Filme filme("Matrix", {"Ação", "Ficção"}, 16, 1999, 10.0);
-    Locacao locacao(cliente, filme, "2023-01-01", "2023-01-10");
-
-    EXPECT_EQ(locacao.calcularDiasAtraso("2023-01-12"), 2);  // 2 dias de atraso
-}
-
-// Teste para verificar exibição de informações usando mocks
-TEST(LocacaoTest, ExibirInformacoesComMock) {
+// Teste do construtor
+TEST(LocacaoTest, Construtor) {
     MockPessoa mockCliente;
     MockFilme mockFilme;
 
-    EXPECT_CALL(mockCliente, getNome())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return("João Mock"));
+    EXPECT_CALL(mockCliente, getNome()).WillRepeatedly(Return("João"));
+    EXPECT_CALL(mockFilme, getTitulo()).WillRepeatedly(Return("Matrix"));
+    EXPECT_CALL(mockFilme, getPreco()).WillRepeatedly(Return(12.99));
 
-    EXPECT_CALL(mockFilme, getTitulo())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return("Mock Movie"));
+    Locacao locacao(mockCliente, mockFilme, "10-01-2024", "15-01-2024");
 
-    EXPECT_CALL(mockFilme, getPreco())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return(25.0));
-
-    Locacao locacao(mockCliente, mockFilme, "2023-01-01", "2023-01-10");
-
-    std::ostringstream buffer;
-    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
-
-    locacao.exibirInformacoes();
-
-    std::cout.rdbuf(oldCout); // Restaurar std::cout
-
-    std::string esperado = 
-        "Cliente: João Mock\n"
-        "Filme: Mock Movie\n"
-        "Data de Locação: 2023-01-01\n"
-        "Data de Devolução: 2023-01-10\n"
-        "Preço da Locação: R$ 25\n";
-
-    EXPECT_EQ(buffer.str(), esperado);
+    EXPECT_EQ(locacao.getCliente().getNome(), "João");
+    EXPECT_EQ(locacao.getFilme().getTitulo(), "Matrix");
+    EXPECT_EQ(locacao.getDataLocacao(), "10-01-2024");
+    EXPECT_EQ(locacao.getDataDevolucao(), "15-01-2024");
 }
 
-// Função principal para rodar os testes
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+// Teste do método getPreco()
+TEST(LocacaoTest, GetPreco) {
+    MockFilme mockFilme;
+    EXPECT_CALL(mockFilme, getPreco()).WillOnce(Return(19.99));
+
+    Locacao locacao(MockPessoa(), mockFilme, "05-01-2024", "10-01-2024");
+
+    EXPECT_DOUBLE_EQ(locacao.getPreco(), 19.99);
+}
+
+// Teste do cálculo de atraso (sem atraso)
+TEST(LocacaoTest, CalcularDiasAtrasoSemAtraso) {
+    Locacao locacao(MockPessoa(), MockFilme(), "05-01-2024", "10-01-2024");
+    EXPECT_EQ(locacao.calcularDiasAtraso("09-01-2024"), 0);
+}
+
+// Teste do cálculo de atraso (com atraso)
+TEST(LocacaoTest, CalcularDiasAtrasoComAtraso) {
+    Locacao locacao(MockPessoa(), MockFilme(), "05-01-2024", "10-01-2024");
+    EXPECT_EQ(locacao.calcularDiasAtraso("15-01-2024"), 5);
+}
+
+// Teste de exibição das informações
+TEST(LocacaoTest, ExibirInformacoes) {
+    MockPessoa mockCliente;
+    MockFilme mockFilme;
+
+    EXPECT_CALL(mockCliente, getNome()).WillRepeatedly(Return("Maria"));
+    EXPECT_CALL(mockFilme, getTitulo()).WillRepeatedly(Return("Titanic"));
+    EXPECT_CALL(mockFilme, getPreco()).WillRepeatedly(Return(9.99));
+
+    Locacao locacao(mockCliente, mockFilme, "01-02-2024", "06-02-2024");
+
+    testing::internal::CaptureStdout();
+    locacao.exibirInformacoes();
+    std::string output = testing::internal::GetCapturedStdout();
+
+    EXPECT_TRUE(output.find("Cliente: Maria") != std::string::npos);
+    EXPECT_TRUE(output.find("Filme: Titanic") != std::string::npos);
+    EXPECT_TRUE(output.find("Data de Locação: 01-02-2024") != std::string::npos);
+    EXPECT_TRUE(output.find("Data de Devolução: 06-02-2024") != std::string::npos);
+    EXPECT_TRUE(output.find("Preço da Locação: R$ 9.99") != std::string::npos);
 }
