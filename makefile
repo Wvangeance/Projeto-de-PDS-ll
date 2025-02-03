@@ -1,6 +1,6 @@
 # Variáveis
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra
+CXXFLAGS = -std=c++17 -Wall -Wextra
 LDFLAGS = 
 OBJDIR = obj
 BINDIR = bin
@@ -14,10 +14,11 @@ EXEC = $(BINDIR)/sistema_locadora
 
 # Regras de compilação
 $(EXEC): $(OBJECTS)
+	@mkdir -p $(BINDIR)  # Garante que o diretório bin/ exista
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(EXEC) $(LDFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR)  # Garante que o diretório obj/ exista
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 # Limpeza dos arquivos gerados
